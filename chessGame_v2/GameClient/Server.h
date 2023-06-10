@@ -5,11 +5,12 @@
 #include <chrono>
 #include <thread>
 #include <mutex>
+
 class Server
 {
-	Server();
 
 	std::mutex mtx;
+public:
 public:
 	void GetLineFromCin_t(std::string* mssg, bool* exit);
 	void receive_and_return(std::vector<sf::TcpSocket*>* sockets, /*sf::Packet p,*/ std::string* mssg, unsigned int* port, bool* exit);

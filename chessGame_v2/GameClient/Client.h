@@ -8,7 +8,6 @@
 
 class Client
 {
-	Client();
 
 	std::mutex mtx;
 public:
