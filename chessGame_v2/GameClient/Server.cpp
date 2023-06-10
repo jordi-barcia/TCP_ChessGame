@@ -106,7 +106,7 @@ void Server::ServerMain()
 	//	//Error when accepting the connection
 	//}
 	//std::cout << "Connection accepted" << std::endl;
-	std::thread accept_socket(&acceptSocket, &dispatcher, &sockets, &exit);
+	std::thread accept_socket(&Server::acceptSocket, this, &dispatcher, &sockets, &exit);
 	accept_socket.detach();
 
 	// We create two packet objects, one for sending and another for receiving data.
@@ -123,10 +123,10 @@ void Server::ServerMain()
 	outPacket.clear();
 
 	// Threads
-	std::thread rcv_t(&receive_and_return, &sockets, /*inPacket,*/ &rcvMessage, &port, &exit);
-	rcv_t.detach();
-	std::thread read_console_t(GetLineFromCin_t, &sendMessage, &exit);
-	read_console_t.detach();
+	std::thread rcv_t(&Server::receive_and_return, this, &sockets, /*inPacket,*/ &rcvMessage, &port, &exit);
+	rcv_t.join();
+	std::thread read_console_t(&Server::GetLineFromCin_t, this, &sendMessage, &exit);
+	read_console_t.join();
 	// Application loop
 	while (true) {
 		// Logic for receiving

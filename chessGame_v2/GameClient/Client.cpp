@@ -57,7 +57,7 @@ void Client::ClientMain()
 	
 	// Client mode
 	std::cout << "Client mode running" << std::endl;
-	std::thread connect_client(&connectClient, &socket);
+	std::thread connect_client(&Client::connectClient, this, &socket);
 	connect_client.detach();
 	//Connection to the server
 	//sf::Socket::Status status = socket.connect("127.0.0.1", 5000, sf::seconds(5.f));
@@ -73,9 +73,9 @@ void Client::ClientMain()
 	//outPacket.clear();
 
 	// Threads
-	std::thread rcv_t(&receive_and_return_cl, &socket, inPacket, &rcvMessage, &exit);
+	std::thread rcv_t(&Client::receive_and_return_cl, this, &socket, inPacket, &rcvMessage, &exit);
 	rcv_t.detach();
-	std::thread read_console_t(&GetLineFromCin_t, &sendMessage, &exit);
+	std::thread read_console_t(&Client::GetLineFromCin_t, this, &sendMessage, &exit);
 	read_console_t.detach();
 
 	while (true) {
