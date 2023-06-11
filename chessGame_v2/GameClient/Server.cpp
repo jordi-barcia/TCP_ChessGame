@@ -64,6 +64,7 @@ void Server::acceptSocket(sf::TcpListener* dispatcher, std::vector<sf::TcpSocket
 			sock->setBlocking(false);
 			mtx.lock();
 			sockets->push_back(sock);
+			count++;
 			mtx.unlock();
 			std::cout << "Acepta conexion" << std::endl;
 			std::cout << sockets->size() << std::endl;
@@ -98,6 +99,7 @@ void Server::disconnect(sf::TcpSocket* sock, std::string mssg)
 	//}
 	p.clear();
 }
+
 
 void Server::ServerMain() 
 {
@@ -134,6 +136,8 @@ void Server::ServerMain()
 
 	// Crear instancia de ChessBoard
 	ChessBoard game;
+	
+	timer.init(duration);
 
 	inPacket << "A"; //Inicializamos los paquetes
 	inPacket.clear();
@@ -149,6 +153,7 @@ void Server::ServerMain()
 
 	// Application loop
 	while (true) {
+		
 		// Logic for receiving
 		if (rcvMessage.size() > 0) 
 		{
@@ -191,7 +196,7 @@ void Server::ServerMain()
 			}
 		}
 
-		if (sockets.size() % 2 == 0 && sockets.size() > 1)
+		if (count == 2)
 		{
 			if (accept_socket.joinable())
 			{
@@ -208,6 +213,8 @@ void Server::ServerMain()
 			// Iniciar partida en un hilo separado
 			std::thread t_run(&ChessBoard::run, &game);
 			t_run.detach();
+			count = 0;
+			
 		}
 
 	}

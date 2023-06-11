@@ -8,13 +8,21 @@
 #include <thread>
 #include <mutex>
 #include "ChessBoard.h"
+#include <time.h>
+#include <stdio.h>
+#include "Timer.h"
 
 class Server
 {
-
 	std::mutex mtx;
 	std::string s_port;
 	std::vector<ChessBoard>games;
+	int count = 0;
+	
+	//Timer
+	Timer timer;
+	int duration = 30;
+	int inGameDuration = 60;
 
 public:
 	std::vector<sf::TcpSocket*> sockets;
