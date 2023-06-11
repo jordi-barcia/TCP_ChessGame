@@ -165,9 +165,12 @@ void Server::ServerMain()
 					}
 				}
 			}
-			std::cout << rcvMessage << std::endl;;
-			sendMessage = rcvMessage;
-			rcvMessage.clear();
+			else {
+				std::cout << rcvMessage << std::endl;;
+				sendMessage = rcvMessage;
+				rcvMessage.clear();
+			}
+	
 		}
 		// Logic for sending
 		// std::cout << "In applicacion loop" << std::endl;
@@ -189,7 +192,16 @@ void Server::ServerMain()
 	dispatcher.close();
 	mtx.lock();
 	for (int i = 0; i < sockets.size(); i++) {
+		disconnect(sockets[i], "exit");
 		sockets[i]->disconnect();
+		delete sockets[i];
+		sockets.erase(sockets.begin() + i);
+	}
+	if (sockets.size() > 0) {
+		disconnect(sockets[0], "exit");
+		sockets[0]->disconnect();
+		delete sockets[0];
+		sockets.erase(sockets.begin());
 	}
 	mtx.unlock();
 	//accept_socket.join();
