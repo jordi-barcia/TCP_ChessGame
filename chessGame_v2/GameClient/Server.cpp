@@ -114,6 +114,8 @@ void Server::ServerMain()
 		// If not connected sucessfully 
 	}
 
+	
+
 	//When accepting a connection, we use the object socket. Once the connection is accepted, 
 	//we can use this object to send and receive data to/from the client.
 	//if (dispatcher.accept(socket) != sf::Socket::Done)
@@ -130,6 +132,8 @@ void Server::ServerMain()
 	std::string sendMessage, rcvMessage;
 	unsigned int port;
 
+	// Crear instancia de ChessBoard
+	ChessBoard game;
 
 	inPacket << "A"; //Inicializamos los paquetes
 	inPacket.clear();
@@ -186,22 +190,42 @@ void Server::ServerMain()
 				sendMessage.clear();
 			}
 		}
+
+		if (sockets.size() % 2 == 0 && sockets.size() > 1)
+		{
+			if (accept_socket.joinable())
+			{
+				accept_socket.join();
+			}
+			if (rcv_t.joinable()) 
+			{
+				rcv_t.join();
+			}
+			if (read_console_t.joinable()) 
+			{
+				read_console_t.join();
+			}
+			// Iniciar partida en un hilo separado
+			std::thread t_run(&ChessBoard::run, &game);
+			t_run.detach();
+		}
+
 	}
+
 
 	// When the application loop is broken, we have to release resources.
 	dispatcher.close();
 	mtx.lock();
-	for (int i = 0; i < sockets.size(); i++) {
-		disconnect(sockets[i], "exit");
-		sockets[i]->disconnect();
-		delete sockets[i];
-		sockets.erase(sockets.begin() + i);
-	}
-	if (sockets.size() > 0) {
-		disconnect(sockets[0], "exit");
-		sockets[0]->disconnect();
-		delete sockets[0];
-		sockets.erase(sockets.begin());
+	while (true) {
+		for (int i = 0; i < sockets.size(); i++) {
+			disconnect(sockets[i], "exit");
+			sockets[i]->disconnect();
+			delete sockets[i];
+			sockets.erase(sockets.begin() + i);
+		}
+		if (sockets.size() == 0) {
+			break;
+		}
 	}
 	mtx.unlock();
 	//accept_socket.join();

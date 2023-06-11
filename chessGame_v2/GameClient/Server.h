@@ -1,16 +1,21 @@
 #pragma once
 #include <SFML\Network.hpp>
-#include <iostream> 
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <fstream>
 #include <future>
 #include <chrono>
 #include <thread>
 #include <mutex>
+#include "ChessBoard.h"
 
 class Server
 {
 
 	std::mutex mtx;
 	std::string s_port;
+	std::vector<ChessBoard>games;
+
 public:
 	std::vector<sf::TcpSocket*> sockets;
 	void GetLineFromCin_t(std::string* mssg, bool* exit);
