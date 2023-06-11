@@ -52,13 +52,10 @@ void Client::ClientMain()
 {
 	bool exit = true;
 
-	sf::TcpSocket socket;
-	std::vector<sf::TcpSocket*> sockets;
-	
 	// Client mode
 	std::cout << "Client mode running" << std::endl;
 	std::thread connect_client(&Client::connectClient, this, &socket);
-	connect_client.detach();
+	connect_client.join();
 	//Connection to the server
 	//sf::Socket::Status status = socket.connect("127.0.0.1", 5000, sf::seconds(5.f));
 	//if (status != sf::Socket::Done)

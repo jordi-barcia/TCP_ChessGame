@@ -89,8 +89,6 @@ void Server::ServerMain()
 
 	bool exit = true;
 
-	std::vector<sf::TcpSocket*> sockets;
-
 	// We open the port 5000 manage TCP connection
 	sf::TcpListener dispatcher;
 	sf::Socket::Status status = dispatcher.listen(5000);
@@ -124,15 +122,16 @@ void Server::ServerMain()
 
 	// Threads
 	std::thread rcv_t(&Server::receive_and_return, this, &sockets, /*inPacket,*/ &rcvMessage, &port, &exit);
-	rcv_t.join();
+	rcv_t.detach();
 	std::thread read_console_t(&Server::GetLineFromCin_t, this, &sendMessage, &exit);
-	read_console_t.join();
+	read_console_t.detach();
+
 	// Application loop
 	while (true) {
 		// Logic for receiving
 		if (rcvMessage.size() > 0) {
 			if (rcvMessage == "exit") {
-				// Manages the desconection 
+				//Gestionar la desconexion
 				break;
 			}
 			std::cout << rcvMessage << std::endl;;

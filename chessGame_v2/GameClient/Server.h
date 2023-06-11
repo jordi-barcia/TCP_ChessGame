@@ -11,7 +11,7 @@ class Server
 
 	std::mutex mtx;
 public:
-public:
+	std::vector<sf::TcpSocket*> sockets;
 	void GetLineFromCin_t(std::string* mssg, bool* exit);
 	void receive_and_return(std::vector<sf::TcpSocket*>* sockets, /*sf::Packet p,*/ std::string* mssg, unsigned int* port, bool* exit);
 	void send_pkt_sv(std::vector<sf::TcpSocket*>* sockets, std::string mssg, unsigned int* port);
