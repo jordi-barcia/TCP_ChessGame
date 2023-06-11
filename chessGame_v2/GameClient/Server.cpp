@@ -72,6 +72,10 @@ void Server::acceptSocket(sf::TcpListener* dispatcher, std::vector<sf::TcpSocket
 			std::string s_port = std::to_string(port);
 			std::string s = "Connected " + s_port + " waiting for opponent";
 			welcome(sock, s);
+			timer.init(duration);
+			timers.push_back(timer);
+			std::cout << timers.size() << std::endl;
+			startCooldown = true;
 		}
 		//delete sock;
 	}
@@ -136,8 +140,6 @@ void Server::ServerMain()
 
 	// Crear instancia de ChessBoard
 	ChessBoard game;
-	
-	timer.init(duration);
 
 	inPacket << "A"; //Inicializamos los paquetes
 	inPacket.clear();
@@ -153,7 +155,26 @@ void Server::ServerMain()
 
 	// Application loop
 	while (true) {
-		
+
+		if (startCooldown && timers.size() > 0) {
+			for (int i = 0; i < timers.size(); i++) {
+				timers[i].update();
+				std::cout << timers[i].temp << std::endl;
+				if (timers[i].temp <= 0) {
+					mtx.lock();
+					disconnect(sockets[i], "exit");
+					sockets[i]->disconnect();
+					delete sockets[i];
+					sockets.erase(sockets.begin() + i);
+					timers.erase(timers.begin() + i);
+					std::cout << "Client disconnected. Total clients: " << sockets.size() << timers.size() << std::endl;
+					count--;
+					mtx.unlock();
+				}
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+
 		// Logic for receiving
 		if (rcvMessage.size() > 0) 
 		{
@@ -170,6 +191,7 @@ void Server::ServerMain()
 						delete sockets[i];
 						sockets.erase(sockets.begin() + i);
 						std::cout << "Client disconnected. Total clients: " << sockets.size() << std::endl;
+						count--;
 						//break;
 					}
 				}
