@@ -23,7 +23,7 @@ void Server::receive_and_return(std::vector<sf::TcpSocket*>* sockets, /*sf::Pack
 				p.clear();
 				//std::cout << "Message Received Sv: ";
 				*port = sock->getRemotePort();
-				std::string s_port = std::to_string(*port);
+				s_port = std::to_string(*port);
 				mssg_temp = s_port + ":" + mssg_temp;
 				mssg->assign(mssg_temp);
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -82,6 +82,23 @@ void Server::welcome(sf::TcpSocket* sock, std::string mssg) {
 	sf::Socket::Status status = sock->send(p);
 }
 
+void Server::disconnect(sf::TcpSocket* sock, std::string mssg)
+{
+	sf::Packet p;
+	std::string mssg_temp;
+	p << mssg;
+	sf::Socket::Status status = sock->send(p);
+
+	if (status != sf::Socket::Done) {
+		// Error when sending data
+		std::cout << "Error when sending data" << std::endl;
+	}
+	//else {
+	//	std::cout << "Message sent:" << mssg << std::endl;
+	//}
+	p.clear();
+}
+
 void Server::ServerMain() 
 {
 	// Server mode
@@ -129,10 +146,24 @@ void Server::ServerMain()
 	// Application loop
 	while (true) {
 		// Logic for receiving
-		if (rcvMessage.size() > 0) {
-			if (rcvMessage == "exit") {
-				//Gestionar la desconexion
-				break;
+		if (rcvMessage.size() > 0) 
+		{
+			//Gestionar la desconexion
+			if (rcvMessage == s_port + ":exit" )
+			{
+				for (int i = 0; i < sockets.size(); i++)
+				{
+					if (sockets[i]->getRemotePort() == port)
+					{
+						// Cliente encontrado, desconectar y eliminar el socket
+						disconnect(sockets[i], "exit");
+						sockets[i]->disconnect();
+						delete sockets[i];
+						sockets.erase(sockets.begin() + i);
+						std::cout << "Client disconnected. Total clients: " << sockets.size() << std::endl;
+						//break;
+					}
+				}
 			}
 			std::cout << rcvMessage << std::endl;;
 			sendMessage = rcvMessage;

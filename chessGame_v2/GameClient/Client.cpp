@@ -79,20 +79,22 @@ void Client::ClientMain()
 		// Logic for receiving
 		if (rcvMessage.size() > 0) {
 			if (rcvMessage == "exit") {
-				// Manages the desconection 
+				// Gestionar la desconexión
+				exit = false;
 				break;
 			}
-			std::cout << rcvMessage << std::endl;;
+			std::cout << rcvMessage << std::endl;
 			rcvMessage.clear();
 		}
+
 		// Logic for sending
-		// std::cout << "In applicacion loop" << std::endl;
 		if (sendMessage.size() > 0) {
 			if (sendMessage == "exit") {
-				// Desconection
-				exit = false;
+				// Desconexión
+				//exit = false;
+				send_pkt(&socket, sendMessage);
 				sendMessage.clear();
-				break;
+				//break;
 			}
 			else {
 				send_pkt(&socket, sendMessage);
@@ -100,6 +102,7 @@ void Client::ClientMain()
 			}
 		}
 	}
+
 	// When the application loop is broken, we have to release resources
-	socket.disconnect();
+	//socket.disconnect();
 }

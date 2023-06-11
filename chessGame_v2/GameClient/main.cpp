@@ -31,10 +31,10 @@ int main(){
 		std::cin >> number;
 	}
 
-	std::thread t_run(&ChessBoard::run, graphics);
+	/*std::thread t_run(&ChessBoard::run, graphics);
 	t_run.detach();
 	ChessBoard graphics2;
-	graphics2.run();
+	graphics2.run();*/
 	
 
 	return 0;

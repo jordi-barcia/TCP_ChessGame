@@ -10,6 +10,7 @@ class Server
 {
 
 	std::mutex mtx;
+	std::string s_port;
 public:
 	std::vector<sf::TcpSocket*> sockets;
 	void GetLineFromCin_t(std::string* mssg, bool* exit);
@@ -17,6 +18,7 @@ public:
 	void send_pkt_sv(std::vector<sf::TcpSocket*>* sockets, std::string mssg, unsigned int* port);
 	void acceptSocket(sf::TcpListener* dispatcher, std::vector<sf::TcpSocket*>* sockets, bool* exit);
 	void welcome(sf::TcpSocket* sock, std::string mssg);
+	void disconnect(sf::TcpSocket* sock, std::string mssg);
 	void ServerMain();
 };
 
