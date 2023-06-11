@@ -10,13 +10,11 @@ public:
 
             initial_time = time(NULL);
             temp = temp_duration;
-
+            deltaTime = time(NULL);
+            lastTime = initial_time;
         }
 
-        void update() {
-
-            static time_t lastTime = initial_time;
-            time_t deltaTime;
+        void update() {           
             //Sacamos la diferencia de tiempo desde la ultima iteracion y la actual
             deltaTime = time(NULL) - lastTime;
             //Actualizamos el tiempo restante
@@ -27,6 +25,8 @@ public:
 
         time_t temp;
 private:
+        time_t deltaTime;
+        time_t lastTime;
         time_t initial_time;
 };
 

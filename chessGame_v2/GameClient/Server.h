@@ -23,7 +23,7 @@ class Server
 	Timer timer;
 	std::vector<Timer> timers;
 	bool startCooldown = false;
-	int duration = 5;
+	int duration = 30;
 	int inGameDuration = 60;
 
 public:

@@ -37,17 +37,21 @@ void Server::send_pkt_sv(std::vector<sf::TcpSocket*>* sockets, std::string mssg,
 	sf::Packet p;
 	p << mssg;
 	mtx.lock();
+	int i = 0;
 	for (sf::TcpSocket* sock : *sockets) {
 
 		if (sock->getRemotePort() != *port) {
 			sf::Socket::Status status = sock->send(p);
+		}
+		else {
+			timers[i].init(duration);
 		}
 		//sf::Socket::Status status = sock->send(p);
 		//if (status != sf::Socket::Done) {
 		//	// Error when sending data
 		//	std::cout << "Error when sending data" << std::endl;
 		//}
-
+		i++;
 	}
 	mtx.unlock();
 	p.clear();
@@ -159,7 +163,7 @@ void Server::ServerMain()
 		if (startCooldown && timers.size() > 0) {
 			for (int i = 0; i < timers.size(); i++) {
 				timers[i].update();
-				std::cout << timers[i].temp << std::endl;
+				//std::cout << timers[i].temp << std::endl;
 				if (timers[i].temp <= 0) {
 					mtx.lock();
 					disconnect(sockets[i], "exit");
@@ -167,12 +171,12 @@ void Server::ServerMain()
 					delete sockets[i];
 					sockets.erase(sockets.begin() + i);
 					timers.erase(timers.begin() + i);
-					std::cout << "Client disconnected. Total clients: " << sockets.size() << timers.size() << std::endl;
+					std::cout << "Client disconnected. Total clients: " << sockets.size() << std::endl;
 					count--;
 					mtx.unlock();
 				}
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 
 		// Logic for receiving
