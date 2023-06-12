@@ -19,10 +19,11 @@ class Server
 	std::vector<ChessBoard>games;
 	int count = 0;
 	
+
 	//Timer
 	Timer timer;
 	std::vector<Timer> timers;
-	int duration = 30;
+	int duration = 120;
 	int inGameDuration = 60;
 
 public:
@@ -32,7 +33,7 @@ public:
 	void send_pkt_sv(std::vector<sf::TcpSocket*>* sockets, std::string mssg, unsigned int* port);
 	void acceptSocket(sf::TcpListener* dispatcher, std::vector<sf::TcpSocket*>* sockets, bool* exit);
 	void welcome(sf::TcpSocket* sock, std::string mssg);
-	void disconnect(sf::TcpSocket* sock, std::string mssg);
+	void packageControl(sf::TcpSocket* sock, std::string mssg);
 	void ServerMain();
 	void timerDisconnection();
 };

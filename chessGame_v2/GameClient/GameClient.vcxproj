@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="ChessBoard.cpp" />
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pieces.cpp" />
     <ClCompile Include="Server.cpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="ChessBoard.h" />
     <ClInclude Include="Client.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="pieces.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="Timer.h" />

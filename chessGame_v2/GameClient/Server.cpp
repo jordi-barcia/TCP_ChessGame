@@ -90,7 +90,7 @@ void Server::welcome(sf::TcpSocket* sock, std::string mssg) {
 	sf::Socket::Status status = sock->send(p);
 }
 
-void Server::disconnect(sf::TcpSocket* sock, std::string mssg)
+void Server::packageControl(sf::TcpSocket* sock, std::string mssg)
 {
 	sf::Packet p;
 	std::string mssg_temp;
@@ -114,7 +114,7 @@ void Server::timerDisconnection() {
 			//std::cout << timers[i].temp << std::endl;
 			if (timers[i].temp <= 0) {
 				mtx.lock();
-				disconnect(sockets[i], "exit");
+				packageControl(sockets[i], "exit");
 				sockets[i]->disconnect();
 				delete sockets[i];
 				sockets.erase(sockets.begin() + i);
@@ -161,8 +161,7 @@ void Server::ServerMain()
 	std::string sendMessage, rcvMessage;
 	unsigned int port;
 
-	// Crear instancia de ChessBoard
-	ChessBoard game;
+	
 
 	inPacket << "A"; //Inicializamos los paquetes
 	inPacket.clear();
@@ -193,7 +192,7 @@ void Server::ServerMain()
 					if (sockets[i]->getRemotePort() == port)
 					{
 						// Cliente encontrado, desconectar y eliminar el socket
-						disconnect(sockets[i], "exit");
+						packageControl(sockets[i], "exit");
 						sockets[i]->disconnect();
 						delete sockets[i];
 						sockets.erase(sockets.begin() + i);
@@ -227,24 +226,11 @@ void Server::ServerMain()
 
 		if (count == 2)
 		{
-			if (accept_socket.joinable())
-			{
-				accept_socket.join();
-			}
-			if (rcv_t.joinable()) 
-			{
-				rcv_t.join();
-			}
-			if (read_console_t.joinable()) 
-			{
-				read_console_t.join();
-			}
-			// Iniciar partida en un hilo separado
-			std::thread t_run(&ChessBoard::run, &game);
-			t_run.detach();
+			packageControl(sockets[sockets.size() - 1], "Game");
+			packageControl(sockets[sockets.size() - 2], "Game");
 			count = 0;
+			
 			//Seleccionar los dos jugadores que estarán en la partida y modificarles el tiempo de desconexión
-
 		}
 
 	}
@@ -255,7 +241,7 @@ void Server::ServerMain()
 	mtx.lock();
 	while (true) {
 		for (int i = 0; i < sockets.size(); i++) {
-			disconnect(sockets[i], "exit");
+			packageControl(sockets[i], "exit");
 			sockets[i]->disconnect();
 			delete sockets[i];
 			sockets.erase(sockets.begin() + i);

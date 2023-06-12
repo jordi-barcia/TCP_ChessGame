@@ -62,6 +62,10 @@ void Client::ClientMain()
 	//{
 	//	// If not connected sucessfully 
 	//}
+
+	// Crear instancia de ChessBoard
+	ChessBoard game;
+
 	int counter = 0;
 	sf::Packet inPacket, outPacket;
 	std::string sendMessage, rcvMessage;
@@ -82,6 +86,10 @@ void Client::ClientMain()
 				// Gestionar la desconexión
 				exit = false;
 				break;
+			}
+			if (rcvMessage == "Game") {
+				// Abrir el juego por cada cliente
+				game.run();
 			}
 			std::cout << rcvMessage << std::endl;
 			rcvMessage.clear();

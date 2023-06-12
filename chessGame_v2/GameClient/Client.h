@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 #include <mutex>
+#include "ChessBoard.h"
 
 class Client
 {
