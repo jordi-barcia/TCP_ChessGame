@@ -22,7 +22,6 @@ class Server
 	//Timer
 	Timer timer;
 	std::vector<Timer> timers;
-	bool startCooldown = false;
 	int duration = 30;
 	int inGameDuration = 60;
 
@@ -35,5 +34,6 @@ public:
 	void welcome(sf::TcpSocket* sock, std::string mssg);
 	void disconnect(sf::TcpSocket* sock, std::string mssg);
 	void ServerMain();
+	void timerDisconnection();
 };
 

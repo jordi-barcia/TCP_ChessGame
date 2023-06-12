@@ -79,7 +79,6 @@ void Server::acceptSocket(sf::TcpListener* dispatcher, std::vector<sf::TcpSocket
 			timer.init(duration);
 			timers.push_back(timer);
 			std::cout << timers.size() << std::endl;
-			startCooldown = true;
 		}
 		//delete sock;
 	}
@@ -108,6 +107,26 @@ void Server::disconnect(sf::TcpSocket* sock, std::string mssg)
 	p.clear();
 }
 
+void Server::timerDisconnection() {
+	if (timers.size() > 0) {
+		for (int i = 0; i < timers.size(); i++) {
+			timers[i].update();
+			//std::cout << timers[i].temp << std::endl;
+			if (timers[i].temp <= 0) {
+				mtx.lock();
+				disconnect(sockets[i], "exit");
+				sockets[i]->disconnect();
+				delete sockets[i];
+				sockets.erase(sockets.begin() + i);
+				timers.erase(timers.begin() + i);
+				std::cout << "Client disconnected. Total clients: " << sockets.size() << std::endl;
+				count--;
+				mtx.unlock();
+			}
+		}
+		//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+}
 
 void Server::ServerMain() 
 {
@@ -160,24 +179,8 @@ void Server::ServerMain()
 	// Application loop
 	while (true) {
 
-		if (startCooldown && timers.size() > 0) {
-			for (int i = 0; i < timers.size(); i++) {
-				timers[i].update();
-				//std::cout << timers[i].temp << std::endl;
-				if (timers[i].temp <= 0) {
-					mtx.lock();
-					disconnect(sockets[i], "exit");
-					sockets[i]->disconnect();
-					delete sockets[i];
-					sockets.erase(sockets.begin() + i);
-					timers.erase(timers.begin() + i);
-					std::cout << "Client disconnected. Total clients: " << sockets.size() << std::endl;
-					count--;
-					mtx.unlock();
-				}
-			}
-			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		}
+		timerDisconnection();
+
 
 		// Logic for receiving
 		if (rcvMessage.size() > 0) 
@@ -240,7 +243,8 @@ void Server::ServerMain()
 			std::thread t_run(&ChessBoard::run, &game);
 			t_run.detach();
 			count = 0;
-			
+			//Seleccionar los dos jugadores que estarán en la partida y modificarles el tiempo de desconexión
+
 		}
 
 	}
