@@ -129,31 +129,37 @@ void ChessBoard::run()
                 // Black pieces turn
                 for (int j = 0; j < 64; ++j) {
                     if (turn % 2 == 0 & board[j] < 0) {
-                        if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y))
-                        {
-                            n = j;
-                            firstpos = rectangle[j].getPosition();
-                            v = spritepositions[j];
-                            rectangle[n].setFillColor(sf::Color::Red);
-                            if (spritepositions[n] != 64)
-                                cap++;
+                        if (firstToPlay == 0) {
+                            if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y))
+                            {
+                                n = j;
+                                firstpos = rectangle[j].getPosition();
+                                v = spritepositions[j];
+                                rectangle[n].setFillColor(sf::Color::Red);
+                                if (spritepositions[n] != 64)
+                                    cap++;
+                            }
                         }
                     }
                 }
-                // White pieces turn
+                
+                // White pieces turn  
                 for (int j = 0; j < 64; ++j) {
                     if (turn % 2 != 0 & board[j] > 0) {
-                        if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y))
-                        {
-                            n = j;
-                            firstpos = rectangle[j].getPosition();
-                            v = spritepositions[j];
-                            rectangle[n].setFillColor(sf::Color::Red);
-                            if (spritepositions[n] != 64)
-                                cap++;
+                        if (firstToPlay == 1) {
+                            if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y))
+                            {
+                                n = j;
+                                firstpos = rectangle[j].getPosition();
+                                v = spritepositions[j];
+                                rectangle[n].setFillColor(sf::Color::Red);
+                                if (spritepositions[n] != 64)
+                                    cap++;
+                            }
                         }
                     }
                 }
+                
             }
             if (cap != 0)
                 // New position

@@ -38,7 +38,8 @@ void Client::receive_and_return_cl(sf::TcpSocket* sock, sf::Packet p, std::strin
 	}
 }
 
-void Client::connectClient(sf::TcpSocket* sock) {
+void Client::connectClient(sf::TcpSocket* sock)
+{
 	// Connection to the server
 	sf::Socket::Status status = sock->connect("127.0.0.1", 5000, sf::seconds(5.f));
 	if (status != sf::Socket::Done)
@@ -89,9 +90,24 @@ void Client::ClientMain()
 			}
 			if (rcvMessage == "Game") {
 				// Abrir el juego por cada cliente
+				unsigned int port;
+				port = socket.getLocalPort();
+				game.ID = port;
+				std::string s_port = std::to_string(game.ID);
+				std::cout << s_port << std::endl;
 				game.run();
 			}
-			std::cout << rcvMessage << std::endl;
+			if (rcvMessage == "1") {
+				game.firstToPlay = 1;
+				std::cout << game.firstToPlay << std::endl;
+			}
+			else if (rcvMessage == "0") {
+				game.firstToPlay = 0;
+				std::cout << game.firstToPlay << std::endl;	
+			}
+			else {
+				std::cout << rcvMessage << std::endl;
+			}
 			rcvMessage.clear();
 		}
 

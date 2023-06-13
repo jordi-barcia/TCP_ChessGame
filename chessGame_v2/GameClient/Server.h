@@ -18,6 +18,7 @@ class Server
 	std::string s_port;
 	std::vector<ChessBoard>games;
 	int count = 0;
+	int createGames = 0;
 	
 
 	//Timer
@@ -25,6 +26,7 @@ class Server
 	std::vector<Timer> timers;
 	int duration = 120;
 	int inGameDuration = 60;
+	int firstToPlay;
 
 public:
 	std::vector<sf::TcpSocket*> sockets;

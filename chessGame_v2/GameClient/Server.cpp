@@ -124,7 +124,7 @@ void Server::timerDisconnection() {
 				mtx.unlock();
 			}
 		}
-		//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
 
@@ -226,8 +226,21 @@ void Server::ServerMain()
 
 		if (count == 2)
 		{
-			packageControl(sockets[sockets.size() - 1], "Game");
-			packageControl(sockets[sockets.size() - 2], "Game");
+			int random = rand() % 2;
+			std::string s_random = std::to_string(random);
+			packageControl(sockets[createGames], s_random);
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			packageControl(sockets[createGames], "Game");
+			createGames++;
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			if (s_random == "0") {
+				packageControl(sockets[createGames], "1");
+			}
+			else {
+				packageControl(sockets[createGames], "0");
+			}
+			packageControl(sockets[createGames], "Game");
+			createGames++;
 			count = 0;
 			
 			//Seleccionar los dos jugadores que estarán en la partida y modificarles el tiempo de desconexión
