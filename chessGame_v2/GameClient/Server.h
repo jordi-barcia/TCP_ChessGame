@@ -11,6 +11,7 @@
 #include <time.h>
 #include <stdio.h>
 #include "Timer.h"
+#include "ServerGame.h"
 
 class Server
 {
@@ -19,7 +20,7 @@ class Server
 	std::vector<ChessBoard>games;
 	int count = 0;
 	int createGames = 0;
-	
+
 
 	//Timer
 	Timer timer;
