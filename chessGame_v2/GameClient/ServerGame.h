@@ -27,6 +27,7 @@ class ServerGame
                     1, 2, 3, 4, 5, 3, 2, 1 };
 	int turn = 1;
 public:
+    bool resetTimer = false;
     int firstToPlay;
 	bool updateboard(int n, int j, sf::RectangleShape rectangle[64], sf::Sprite sprite[65]);
 	void run();

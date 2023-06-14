@@ -114,6 +114,17 @@ void Server::timerDisconnection() {
 			//std::cout << timers[i].temp << std::endl;
 			if (timers[i].temp <= 0) {
 				mtx.lock();
+				if (createGames > 1) { //Significa que hay games creados
+					std::cout << "Cliente " << sockets[i]->getRemotePort() << " ha perdido por inactividad" << std::endl;
+					if (i % 2 == 0) { //Ha perdido un cliente par, por lo tanto, el primero de los 2 jugadores
+						std::cout << "Cliente " << sockets[i + 1]->getRemotePort() << " has ganado!" << std::endl;
+					}
+					else {
+						std::cout << "Cliente " << sockets[i - 1]->getRemotePort() << " has ganado!" << std::endl;
+					}
+					createGames -= 2;
+					std::this_thread::sleep_for(std::chrono::milliseconds(30));	
+				}
 				packageControl(sockets[i], "exit");
 				sockets[i]->disconnect();
 				delete sockets[i];
@@ -231,6 +242,7 @@ void Server::ServerMain()
 			std::string s_random = std::to_string(random);
 			packageControl(sockets[createGames], s_random);
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			timers[createGames].init(inGameDuration); //Reseteamos el temporizador del jugador y le ponemos el tiempo de desconexión de la partida
 			packageControl(sockets[createGames], "Game");
 			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			//games.push_back();
@@ -241,11 +253,11 @@ void Server::ServerMain()
 			else {
 				packageControl(sockets[createGames], "0");
 			}
+			timers[createGames].init(inGameDuration); //Reseteamos el temporizador del jugador y le ponemos el tiempo de desconexión de la partida
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			packageControl(sockets[createGames], "Game");
 			createGames++;
 			count = 0;
-			//Seleccionar los dos jugadores que estarán en la partida y modificarles el tiempo de desconexión
 		}
 
 	}

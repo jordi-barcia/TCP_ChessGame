@@ -95,7 +95,9 @@ void Client::ClientMain()
 				game.ID = port;
 				std::string s_port = std::to_string(game.ID);
 				std::cout << s_port << std::endl;
-				game.run();
+				//game.run();
+				std::thread game(&ChessBoard::run, &game);
+				game.detach();
 			}
 			if (rcvMessage == "1") {
 				game.firstToPlay = 1;
@@ -105,24 +107,26 @@ void Client::ClientMain()
 				game.firstToPlay = 0;
 				std::cout << game.firstToPlay << std::endl;	
 			}
-			else {
+			else if(rcvMessage != "Game"){
 				std::cout << rcvMessage << std::endl;
 			}
 			rcvMessage.clear();
 		}
 
 		// Logic for sending
-		if (sendMessage.size() > 0) {
-			if (sendMessage == "exit") {
-				// Desconexión
-				//exit = false;
-				send_pkt(&socket, sendMessage);
-				sendMessage.clear();
-				//break;
-			}
-			else {
-				send_pkt(&socket, sendMessage);
-				sendMessage.clear();
+		if (game.firstToPlay == -1) {
+			if (sendMessage.size() > 0) {
+				if (sendMessage == "exit") {
+					// Desconexión
+					//exit = false;
+					send_pkt(&socket, sendMessage);
+					sendMessage.clear();
+					//break;
+				}
+				else {
+					send_pkt(&socket, sendMessage);
+					sendMessage.clear();
+				}
 			}
 		}
 	}

@@ -53,9 +53,9 @@ void ServerGame::run()
         sf::Event event;
         while (true)
         {
-            if (event.type == sf::Event::Closed) {
-                //window.close();
-            }
+            //if (event.type == sf::Event::Closed) {
+            //    //window.close();
+            //}
             // Pieces selection
             if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
                 // Black pieces turn
@@ -99,6 +99,7 @@ void ServerGame::run()
                         if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y)) {
                             isMove = box.identifier(n, j, board[n], board);
                             if (isMove) {
+                                resetTimer = true;
                                 game_end = updateboard(n, j, rectangle, sprite);
                                 q[j] = spritepositions[j];
                                 if (game_end) { /*window.close();*/ }

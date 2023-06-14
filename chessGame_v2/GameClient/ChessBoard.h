@@ -33,7 +33,7 @@ class ChessBoard{
   public:  
     int turn = 1;
     unsigned int ID;
-    int firstToPlay;
+    int firstToPlay = -1;
     void loadtextures(Texture texture[64]);
     void loadboard(Texture texture[64],RectangleShape rectangle[64],Sprite sprite[64]);
     bool updateboard(int n, int j, sf::RectangleShape rectangle[64], sf::Sprite sprite[65]);
