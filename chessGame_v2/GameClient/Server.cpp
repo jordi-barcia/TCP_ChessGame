@@ -226,23 +226,25 @@ void Server::ServerMain()
 
 		if (count == 2)
 		{
-			int random = rand() % 2;
+			//Creación de los games para los 2 clientes
+			int random = rand() % 2; //Valor random de 0-1 para escoger quien juega las fichas blancas o negras
 			std::string s_random = std::to_string(random);
 			packageControl(sockets[createGames], s_random);
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			packageControl(sockets[createGames], "Game");
+			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			//games.push_back();
 			createGames++;
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			if (s_random == "0") {
 				packageControl(sockets[createGames], "1");
 			}
 			else {
 				packageControl(sockets[createGames], "0");
 			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			packageControl(sockets[createGames], "Game");
 			createGames++;
 			count = 0;
-			
 			//Seleccionar los dos jugadores que estarán en la partida y modificarles el tiempo de desconexión
 		}
 

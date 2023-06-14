@@ -1,4 +1,5 @@
 #include "ServerGame.h"
+#include "Pieces.h"
 bool ServerGame::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf::Sprite sprite[65])
 {
     int cc;
@@ -34,7 +35,10 @@ bool ServerGame::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
 }
 void ServerGame::run()
 {
-    bool isMove, game_end;
+    sf::RectangleShape rectangle[64];
+    sf::Sprite sprite[65];
+    Identity box;
+    bool isMove, game_end = false;
     int n;
     int position;
     Vector2f firstpos, secondpos;
@@ -47,10 +51,10 @@ void ServerGame::run()
     while (!game_end)
     {
         sf::Event event;
-        while (window.pollEvent(event))
+        while (true)
         {
             if (event.type == sf::Event::Closed) {
-                window.close();
+                //window.close();
             }
             // Pieces selection
             if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
@@ -97,25 +101,26 @@ void ServerGame::run()
                             if (isMove) {
                                 game_end = updateboard(n, j, rectangle, sprite);
                                 q[j] = spritepositions[j];
-                                if (game_end) { window.close(); }
+                                if (game_end) { /*window.close();*/ }
                             }
 
                             // Filling board colors
-                            int counter = 0;
-                            for (int i = 0; i < 8; ++i) {
-                                for (int j = 0; j < 8; ++j) {
-                                    if ((i + j) % 2 == 0)
-                                        rectangle[counter].setFillColor(sf::Color::White);
-                                    else
-                                        rectangle[counter].setFillColor(sf::Color::Blue);
-                                    counter++;
-                                }
-                            }
+                           //int counter = 0;
+                           //for (int i = 0; i < 8; ++i) {
+                           //    for (int j = 0; j < 8; ++j) {
+                           //        if ((i + j) % 2 == 0)
+                           //            rectangle[counter].setFillColor(sf::Color::White);
+                           //        else
+                           //            rectangle[counter].setFillColor(sf::Color::Blue);
+                           //        counter++;
+                           //    }
+                           //}
                         }
                     }
                     cap = 0;
                 }
         }
+        /*
         window.clear();
         for (int j = 0; j < 64; ++j)
             window.draw(rectangle[j]);
@@ -124,5 +129,6 @@ void ServerGame::run()
                 window.draw(sprite[j]);
         }
         window.display();
+        */
     }
 }

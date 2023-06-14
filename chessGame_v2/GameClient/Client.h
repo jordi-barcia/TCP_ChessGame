@@ -11,7 +11,7 @@ class Client
 {
 	std::mutex mtx;
 	sf::TcpSocket socket;
-
+	ChessBoard game;
 public:
 	void GetLineFromCin_t(std::string* mssg, bool* exit);
 	void send_pkt(sf::TcpSocket* sock, std::string mssg);

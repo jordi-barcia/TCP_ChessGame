@@ -65,7 +65,7 @@ void Client::ClientMain()
 	//}
 
 	// Crear instancia de ChessBoard
-	ChessBoard game;
+	
 
 	int counter = 0;
 	sf::Packet inPacket, outPacket;
@@ -130,3 +130,5 @@ void Client::ClientMain()
 	// When the application loop is broken, we have to release resources
 	//socket.disconnect();
 }
+
+
