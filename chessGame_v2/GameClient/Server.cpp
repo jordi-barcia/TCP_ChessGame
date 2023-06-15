@@ -8,9 +8,8 @@ void Server::GetLineFromCin_t(std::string* mssg, bool* exit) {
 	}
 }
 
-void Server::receive_and_return(std::vector<sf::TcpSocket*>* sockets, /*sf::Packet p,*/ std::string* mssg, unsigned int* port, bool* exit) {
+void Server::receive_and_return(std::vector<sf::TcpSocket*>* sockets, std::string* mssg, unsigned int* port, bool* exit) { // Recibe los paquetes de los clientes. 
 	std::string mssg_temp;
-	//std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 	sf::Packet p;
 	p << "A";
 	p.clear();
@@ -21,7 +20,6 @@ void Server::receive_and_return(std::vector<sf::TcpSocket*>* sockets, /*sf::Pack
 			p >> mssg_temp;
 			if (mssg_temp.size() > 0) {
 				p.clear();
-				//std::cout << "Message Received Sv: ";
 				*port = sock->getRemotePort();
 				s_port = std::to_string(*port);
 				mssg_temp = s_port + ":" + mssg_temp;
@@ -33,7 +31,7 @@ void Server::receive_and_return(std::vector<sf::TcpSocket*>* sockets, /*sf::Pack
 	}
 }
 
-void Server::send_pkt_sv(std::vector<sf::TcpSocket*>* sockets, std::string mssg, unsigned int* port) {
+void Server::send_pkt_sv(std::vector<sf::TcpSocket*>* sockets, std::string mssg, unsigned int* port) { // Envia un mensaje a todos lo clientes excepto al que ha enviado el mensaje.
 	sf::Packet p;
 	p << mssg;
 	mtx.lock();
@@ -46,11 +44,6 @@ void Server::send_pkt_sv(std::vector<sf::TcpSocket*>* sockets, std::string mssg,
 		else {
 			timers[i].init(duration);
 		}
-		//sf::Socket::Status status = sock->send(p);
-		//if (status != sf::Socket::Done) {
-		//	// Error when sending data
-		//	std::cout << "Error when sending data" << std::endl;
-		//}
 		i++;
 	}
 	mtx.unlock();
@@ -80,7 +73,6 @@ void Server::acceptSocket(sf::TcpListener* dispatcher, std::vector<sf::TcpSocket
 			timers.push_back(timer);
 			std::cout << timers.size() << std::endl;
 		}
-		//delete sock;
 	}
 }
 
@@ -90,7 +82,7 @@ void Server::welcome(sf::TcpSocket* sock, std::string mssg) {
 	sf::Socket::Status status = sock->send(p);
 }
 
-void Server::packageControl(sf::TcpSocket* sock, std::string mssg)
+void Server::packageControl(sf::TcpSocket* sock, std::string mssg) // Envia un paquete a un cliente. 
 {
 	sf::Packet p;
 	std::string mssg_temp;
@@ -101,9 +93,6 @@ void Server::packageControl(sf::TcpSocket* sock, std::string mssg)
 		// Error when sending data
 		std::cout << "Error when sending data" << std::endl;
 	}
-	//else {
-	//	std::cout << "Message sent:" << mssg << std::endl;
-	//}
 	p.clear();
 }
 
@@ -154,15 +143,6 @@ void Server::ServerMain()
 		// If not connected sucessfully 
 	}
 
-	
-
-	//When accepting a connection, we use the object socket. Once the connection is accepted, 
-	//we can use this object to send and receive data to/from the client.
-	//if (dispatcher.accept(socket) != sf::Socket::Done)
-	//{
-	//	//Error when accepting the connection
-	//}
-	//std::cout << "Connection accepted" << std::endl;
 	std::thread accept_socket(&Server::acceptSocket, this, &dispatcher, &sockets, &exit);
 	accept_socket.detach();
 
@@ -181,7 +161,7 @@ void Server::ServerMain()
 	outPacket.clear();
 
 	// Threads
-	std::thread rcv_t(&Server::receive_and_return, this, &sockets, /*inPacket,*/ &rcvMessage, &port, &exit);
+	std::thread rcv_t(&Server::receive_and_return, this, &sockets, &rcvMessage, &port, &exit);
 	rcv_t.detach();
 	std::thread read_console_t(&Server::GetLineFromCin_t, this, &sendMessage, &exit);
 	read_console_t.detach();
@@ -189,8 +169,7 @@ void Server::ServerMain()
 	// Application loop
 	while (true) {
 
-		timerDisconnection();
-
+		timerDisconnection(); // Se encarga del calculo para desconectar a los clientes.
 
 		// Logic for receiving
 		if (rcvMessage.size() > 0) 
@@ -209,7 +188,6 @@ void Server::ServerMain()
 						sockets.erase(sockets.begin() + i);
 						std::cout << "Client disconnected. Total clients: " << sockets.size() << std::endl;
 						count--;
-						//break;
 					}
 				}
 			}
@@ -220,11 +198,11 @@ void Server::ServerMain()
 			}
 	
 		}
+
 		// Logic for sending
-		// std::cout << "In applicacion loop" << std::endl;
 		if (sendMessage.size() > 0) {
 			if (sendMessage == "exit") {
-				// Desconection
+				// Desconnection
 				exit = false;
 				sendMessage.clear();
 				break;
@@ -244,9 +222,8 @@ void Server::ServerMain()
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			timers[createGames].init(inGameDuration); //Reseteamos el temporizador del jugador y le ponemos el tiempo de desconexión de la partida
 			packageControl(sockets[createGames], "Game");
-			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			//games.push_back();
 			createGames++;
+
 			if (s_random == "0") {
 				packageControl(sockets[createGames], "1");
 			}
@@ -278,7 +255,4 @@ void Server::ServerMain()
 		}
 	}
 	mtx.unlock();
-	//accept_socket.join();
-	//rcv_t.join();
-	//read_console_t.join();
 }
