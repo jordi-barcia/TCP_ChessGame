@@ -21,6 +21,7 @@ class Server
 	int count = 0;
 	int createGames = 0;
 
+	//Struct
 
 	//Timer
 	Timer timer;
