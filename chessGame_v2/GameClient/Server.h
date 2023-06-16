@@ -17,11 +17,15 @@ class Server
 {
 	std::mutex mtx;
 	std::string s_port;
-	std::vector<ChessBoard>games; // Vector de games para gestionar las partidas. 
+	int ID = 0;
+	std::vector<int>IDgames; // Vector de games para gestionar las partidas. 
 	int count = 0;
 	int createGames = 0;
-
-	//Struct
+	bool checkPositions = false;
+	bool firstMessage = false;
+	int temp_n, temp_j;
+	int temp = -1;
+	ServerGame s_game;
 
 	//Timer
 	Timer timer;

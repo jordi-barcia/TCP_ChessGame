@@ -104,8 +104,6 @@ void ChessBoard::run()
     loadtextures(texture);
     loadboard(texture, rectangle, sprite);
     Identity box;
-    bool isMove, game_end;
-    int n;
     int position;
     Vector2f firstpos, secondpos;
     int v; int q[64];
@@ -164,7 +162,13 @@ void ChessBoard::run()
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     for (int j = 0; j < 64; ++j) {
                         if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y)) {
-                            isMove = box.identifier(n, j, board[n], board);
+                            //isMove = box.identifier(n, j, board[n], board);
+                            //Enviar n i j al servidor para el check
+                            z = j;
+                            while (!received) {
+                                if (!sent) sent = true;
+                            }
+
                             if (isMove) {
                                 game_end = updateboard(n, j, rectangle, sprite); 
                                 q[j] = spritepositions[j];
@@ -185,7 +189,7 @@ void ChessBoard::run()
                         }
                     }
                     cap = 0;
-                    }
+                }
         }
         window.clear();
         for (int j = 0; j < 64; ++j)

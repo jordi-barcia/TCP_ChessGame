@@ -93,6 +93,16 @@ void Client::ClientMain()
 			else if(rcvMessage != "Game"){
 				std::cout << rcvMessage << std::endl;
 			}
+			if (rcvMessage == "Movimiento Correcto") {
+				game.isMove = true;
+				game.received = true;
+			}
+			if (rcvMessage == "Movimiento Incorrecto") {
+				game.isMove = false;
+				game.received = true;
+				doneSent = false;
+				game.sent = false;
+			}
 			rcvMessage.clear();
 		}
 
@@ -109,6 +119,23 @@ void Client::ClientMain()
 					sendMessage.clear();
 				}
 			}
+		}
+
+		if (game.sent && !doneSent) {
+			sendMessage = "CheckPosition";
+			send_pkt(&socket, sendMessage);
+			sendMessage.clear();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			std::string s_n = std::to_string(game.n);
+			send_pkt(&socket, s_n);
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			std::string s_j = std::to_string(game.z);
+			send_pkt(&socket, s_j);
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			sendMessage = "Enviados";
+			send_pkt(&socket, sendMessage);
+			sendMessage.clear();
+			doneSent = true;
 		}
 	}
 

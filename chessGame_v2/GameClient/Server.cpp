@@ -174,6 +174,9 @@ void Server::ServerMain()
 		// Logic for receiving
 		if (rcvMessage.size() > 0) 
 		{
+			if (rcvMessage == "CheckPosition") {
+				checkPositions = true;
+			}
 			//Gestionar la desconexion
 			if (rcvMessage == s_port + ":exit" )
 			{
@@ -191,12 +194,11 @@ void Server::ServerMain()
 					}
 				}
 			}
-			else {
-				std::cout << rcvMessage << std::endl;;
+			else if(!checkPositions) {
+				std::cout << rcvMessage << std::endl;
 				sendMessage = rcvMessage;
 				rcvMessage.clear();
-			}
-	
+			}	
 		}
 
 		// Logic for sending
@@ -222,6 +224,7 @@ void Server::ServerMain()
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			timers[createGames].init(inGameDuration); //Reseteamos el temporizador del jugador y le ponemos el tiempo de desconexión de la partida
 			packageControl(sockets[createGames], "Game");
+			IDgames.push_back(ID); //Guardamos la ID del game en el vector de IDgames
 			createGames++;
 
 			if (s_random == "0") {
@@ -233,8 +236,69 @@ void Server::ServerMain()
 			timers[createGames].init(inGameDuration); //Reseteamos el temporizador del jugador y le ponemos el tiempo de desconexión de la partida
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			packageControl(sockets[createGames], "Game");
+			IDgames.push_back(ID); //Guardamos la ID del game en el vector de IDgames
 			createGames++;
+			ID++;
 			count = 0;
+		}
+		if (checkPositions) {
+			if (!firstMessage && rcvMessage != "Enviados") {
+				temp_n = stoi(rcvMessage);
+				firstMessage = true;
+			}
+			if (firstMessage && rcvMessage != "Enviados") {
+				temp_j = stoi(rcvMessage);
+			}
+			if (rcvMessage == "Enviados") {
+				s_game.run(temp_n, temp_j); 
+				firstMessage = false;
+				checkPositions = false;
+				
+			}
+		}
+
+		if (s_game.resetTimer && s_game.done) {
+			for (int i = 0; i < sockets.size(); i++)
+			{
+				if (sockets[i]->getRemotePort() == port && temp == -1)
+				{
+					temp = i;
+					packageControl(sockets[i], "Movimiento Correcto");
+					timers[i].init(inGameDuration);
+				}
+				for (int j = 0; j < sockets.size(); j++)
+				{
+					if (temp != j) {
+						if (IDgames[j] == IDgames[temp]) {
+							packageControl(sockets[i], "Movimiento Correcto");
+						}
+					}
+				}
+			}
+			s_game.resetTimer = false;
+			s_game.done = false;
+			temp = -1;
+		}
+		if (!s_game.resetTimer && s_game.done) {
+			for (int i = 0; i < sockets.size(); i++)
+			{
+				if (sockets[i]->getRemotePort() == port && temp == -1)
+				{
+					temp = i;
+					packageControl(sockets[i], "Movimiento Incorrecto");
+				}
+				for (int j = 0; j < sockets.size(); j++)
+				{
+					if (temp != j) {
+						if (IDgames[j] == IDgames[temp]) {
+							packageControl(sockets[i], "Movimiento Incorrecto");
+						}
+					}
+				}
+			}
+			s_game.resetTimer = false;
+			s_game.done = false;
+			temp = -1;
 		}
 
 	}

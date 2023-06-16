@@ -12,6 +12,7 @@ class Client
 	std::mutex mtx;
 	sf::TcpSocket socket;
 	ChessBoard game;
+	bool doneSent = false;
 public:
 	void GetLineFromCin_t(std::string* mssg, bool* exit);
 	void send_pkt(sf::TcpSocket* sock, std::string mssg); // Funcion que nos sirve para enviar mensajes al servidor. 

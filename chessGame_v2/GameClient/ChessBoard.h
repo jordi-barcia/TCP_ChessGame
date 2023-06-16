@@ -31,7 +31,11 @@ class ChessBoard{
 
 
   public:  
+    bool isMove, game_end;
     int turn = 1;
+    int n, z;
+    bool sent = false;
+    bool received = false;
     unsigned int ID;
     int firstToPlay = -1;
     void loadtextures(Texture texture[64]);
