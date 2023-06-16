@@ -31,9 +31,11 @@ class ChessBoard{
 
 
   public:  
+    int cap = 0;
     bool isMove, game_end;
     int turn = 1;
     int n, z;
+    bool hasMoved = false;
     bool sent = false;
     bool received = false;
     unsigned int ID;

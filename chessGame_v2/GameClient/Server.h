@@ -17,6 +17,7 @@ class Server
 {
 	std::mutex mtx;
 	std::string s_port;
+	std::string temporalMessage;
 	int ID = 0;
 	std::vector<int>IDgames; // Vector de games para gestionar las partidas. 
 	int count = 0;

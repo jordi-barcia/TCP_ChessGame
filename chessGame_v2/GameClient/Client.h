@@ -13,6 +13,9 @@ class Client
 	sf::TcpSocket socket;
 	ChessBoard game;
 	bool doneSent = false;
+	bool receivedMovement = false;
+	bool firstMessage = false;
+	std::string temporalMessage;
 public:
 	void GetLineFromCin_t(std::string* mssg, bool* exit);
 	void send_pkt(sf::TcpSocket* sock, std::string mssg); // Funcion que nos sirve para enviar mensajes al servidor. 

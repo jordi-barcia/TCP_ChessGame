@@ -22,6 +22,7 @@ void Server::receive_and_return(std::vector<sf::TcpSocket*>* sockets, std::strin
 				p.clear();
 				*port = sock->getRemotePort();
 				s_port = std::to_string(*port);
+				temporalMessage = mssg_temp;
 				mssg_temp = s_port + ":" + mssg_temp;
 				mssg->assign(mssg_temp);
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -174,9 +175,13 @@ void Server::ServerMain()
 		// Logic for receiving
 		if (rcvMessage.size() > 0) 
 		{
-			if (rcvMessage == "CheckPosition") {
+			if (rcvMessage == s_port + ":CheckPosition") {
 				checkPositions = true;
+				rcvMessage.clear();
+				std::cout << "AAAAAAAAAAAAA" << std::endl;
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
+			
 			//Gestionar la desconexion
 			if (rcvMessage == s_port + ":exit" )
 			{
@@ -199,6 +204,27 @@ void Server::ServerMain()
 				sendMessage = rcvMessage;
 				rcvMessage.clear();
 			}	
+			if (checkPositions) {
+				if (!firstMessage && rcvMessage != s_port + ":Enviados") {
+					std::cout << rcvMessage << std::endl;
+					temp_n = stoi(temporalMessage);
+					firstMessage = true;
+					rcvMessage.clear();
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				}
+				if (firstMessage && rcvMessage != s_port + ":Enviados") {
+					std::cout << rcvMessage << std::endl;
+					temp_j = stoi(temporalMessage);
+					rcvMessage.clear();
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				}
+				if (rcvMessage == s_port + ":Enviados") {
+					s_game.run(temp_n, temp_j);
+					firstMessage = false;
+					checkPositions = false;
+					rcvMessage.clear();
+				}
+			}
 		}
 
 		// Logic for sending
@@ -241,21 +267,7 @@ void Server::ServerMain()
 			ID++;
 			count = 0;
 		}
-		if (checkPositions) {
-			if (!firstMessage && rcvMessage != "Enviados") {
-				temp_n = stoi(rcvMessage);
-				firstMessage = true;
-			}
-			if (firstMessage && rcvMessage != "Enviados") {
-				temp_j = stoi(rcvMessage);
-			}
-			if (rcvMessage == "Enviados") {
-				s_game.run(temp_n, temp_j); 
-				firstMessage = false;
-				checkPositions = false;
-				
-			}
-		}
+		
 
 		if (s_game.resetTimer && s_game.done) {
 			for (int i = 0; i < sockets.size(); i++)
@@ -265,12 +277,33 @@ void Server::ServerMain()
 					temp = i;
 					packageControl(sockets[i], "Movimiento Correcto");
 					timers[i].init(inGameDuration);
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					
+					std::string s_n = std::to_string(temp_n);
+					packageControl(sockets[i], s_n);
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+					std::string s_j = std::to_string(temp_j);
+					packageControl(sockets[i], s_j);
+					std::this_thread::sleep_for(std::chrono::milliseconds(110));
+					std::cout << s_n + " : " + s_j << std::endl;
 				}
 				for (int j = 0; j < sockets.size(); j++)
 				{
 					if (temp != j) {
 						if (IDgames[j] == IDgames[temp]) {
-							packageControl(sockets[i], "Movimiento Correcto");
+							packageControl(sockets[j], "Movimiento Correcto");
+							
+							std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+							std::string s_n = std::to_string(temp_n);
+							packageControl(sockets[j], s_n);
+							std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+							std::string s_j = std::to_string(temp_j);
+							packageControl(sockets[j], s_j);
+							std::this_thread::sleep_for(std::chrono::milliseconds(110));
+							std::cout << s_n + " : " + s_j << std::endl;
 						}
 					}
 				}

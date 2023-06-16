@@ -68,6 +68,7 @@ bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
     int spritepos = spritepositions[n];
     bool game_finished;
     turn++;
+    std::cout << "ME TURNEOOO" << std::endl;
     cc = spritepositions[j];
     if (j != n) {
         sprite[spritepos].setPosition(secondpos);
@@ -91,6 +92,7 @@ bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
         }
         n = j;
     }
+    hasMoved = false;
     return false; // Game not finished
 }
 
@@ -107,7 +109,7 @@ void ChessBoard::run()
     int position;
     Vector2f firstpos, secondpos;
     int v; int q[64];
-    static int cap = 0;
+    
     for (int j = 0; j < 64; ++j)
         q[j] = 64;
     Vector2i pos;
@@ -121,7 +123,7 @@ void ChessBoard::run()
                 window.close();
             }
             // Pieces selection
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Right) || hasMoved) {
                 // Black pieces turn
                 for (int j = 0; j < 64; ++j) {
                     if (turn % 2 == 0 & board[j] < 0) {
@@ -159,7 +161,7 @@ void ChessBoard::run()
             }
             if (cap != 0)
                 // New position
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left) || hasMoved) {
                     for (int j = 0; j < 64; ++j) {
                         if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y)) {
                             //isMove = box.identifier(n, j, board[n], board);
@@ -168,6 +170,7 @@ void ChessBoard::run()
                             while (!received) {
                                 if (!sent) sent = true;
                             }
+                            j = z;
 
                             if (isMove) {
                                 game_end = updateboard(n, j, rectangle, sprite); 
