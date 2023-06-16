@@ -94,40 +94,54 @@ void Client::ClientMain()
 			else if (rcvMessage != "Game") {
 				std::cout << rcvMessage << std::endl;
 			}
-			if (rcvMessage == "Movimiento Correcto") {
+			if (rcvMessage == "Movimiento Contrario Correcto") {
 				receivedMovement = true;
+				rcvMessage.clear();
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
+			if (rcvMessage == "Movimiento Correcto") {
+				game.isMove = true;
+				game.received = true;
+				doneSent = false;
+				game.sent = false;
 				rcvMessage.clear();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
 			if (rcvMessage == "Movimiento Incorrecto") {
 				game.isMove = false;
-				game.received = true;
+				game.received = false;
 				doneSent = false;
 				game.sent = false;
 			}
 			if (receivedMovement) {
+
 				if (!firstMessage && rcvMessage != "Enviados") {
-					game.n = stoi(temporalMessage);
 					std::cout << temporalMessage << std::endl;
+					game.m = stoi(temporalMessage);
 					firstMessage = true;
 					rcvMessage.clear();
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				}
 				if (firstMessage && rcvMessage != "Enviados") {
-					game.z = stoi(temporalMessage);
 					std::cout << temporalMessage << std::endl;
+					game.z = stoi(temporalMessage);
 					rcvMessage.clear();
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				}
 				if (rcvMessage == "Enviados") {
 					firstMessage = false;
 					receivedMovement = false;
 					rcvMessage.clear();
+					std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				}
-				game.cap++;
 				game.hasMoved = true;
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+				game.cap = 1;
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				game.isMove = true;
 				game.received = true;
+				doneSent = false;
+				game.sent = false;
 			}
 			rcvMessage.clear();
 		}
@@ -167,7 +181,7 @@ void Client::ClientMain()
 		}
 	}
 
-	// When the application loop is broken, we have to release resources
+	// When the application loop is broken, we have to release resourcesº
 	//socket.disconnect();
 }
 

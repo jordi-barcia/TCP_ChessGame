@@ -34,7 +34,7 @@ class ChessBoard{
     int cap = 0;
     bool isMove, game_end;
     int turn = 1;
-    int n, z;
+    int n = 0, z = 0, m = 0;
     bool hasMoved = false;
     bool sent = false;
     bool received = false;

@@ -93,6 +93,7 @@ bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
         n = j;
     }
     hasMoved = false;
+    received = false;
     return false; // Game not finished
 }
 
@@ -123,7 +124,7 @@ void ChessBoard::run()
                 window.close();
             }
             // Pieces selection
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Right) || hasMoved) {
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
                 // Black pieces turn
                 for (int j = 0; j < 64; ++j) {
                     if (turn % 2 == 0 & board[j] < 0) {
@@ -159,6 +160,7 @@ void ChessBoard::run()
                 }
                 
             }
+
             if (cap != 0)
                 // New position
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left) || hasMoved) {
@@ -167,17 +169,31 @@ void ChessBoard::run()
                             //isMove = box.identifier(n, j, board[n], board);
                             //Enviar n i j al servidor para el check
                             z = j;
+                            
                             while (!received) {
                                 if (!sent) sent = true;
                             }
-                            j = z;
 
                             if (isMove) {
-                                game_end = updateboard(n, j, rectangle, sprite); 
-                                q[j] = spritepositions[j];
-                                if (game_end) { window.close(); }
+                                if (!hasMoved) {
+                                    game_end = updateboard(n, z, rectangle, sprite);
+                                    isMove = false;
+                                    if (game_end) { window.close(); }
+                                }
+                                else {
+                                    //Al mover ficha en el turno de las negras llama a Abort()
+                                    
+                                    firstpos = rectangle[z].getPosition();
+                                    v = spritepositions[z];
+                                    game_end = updateboard(m, z, rectangle, sprite);
+                                    //turn++;
+                                    //hasMoved = false;
+                                    //received = false;
+                                    isMove = false;
+                                }
+                                q[z] = spritepositions[z];
                             }
-
+                            
                             // Filling board colors
                             int counter = 0;
                             for (int i = 0; i < 8; ++i) {
