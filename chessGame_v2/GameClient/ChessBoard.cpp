@@ -68,7 +68,7 @@ bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
     int spritepos = spritepositions[n];
     bool game_finished;
     turn++;
-    std::cout << "ME TURNEOOO" << std::endl;
+    std::cout << "NEXT TURN" << std::endl;
     cc = spritepositions[j];
     if (j != n) {
         sprite[spritepos].setPosition(secondpos);
@@ -161,37 +161,62 @@ void ChessBoard::run()
                 
             }
 
+            if (hasMoved) {
+                if (isMove) {
+                    std::cout << "22222222222" << std::endl;
+                    firstpos = rectangle[z].getPosition();
+                    v = spritepositions[z];
+                    game_end = updateboard(m, z, rectangle, sprite);
+                    isMove = false;
+                    q[z] = spritepositions[z];
+                }
+                int counter = 0;
+                for (int i = 0; i < 8; ++i) {
+                    for (int j = 0; j < 8; ++j) {
+                        if ((i + j) % 2 == 0)
+                            rectangle[counter].setFillColor(sf::Color::White);
+                        else
+                            rectangle[counter].setFillColor(sf::Color::Blue);
+                        counter++;
+                    }
+                }
+                cap = 0;
+            }
+
             if (cap != 0)
                 // New position
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left) || hasMoved) {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     for (int j = 0; j < 64; ++j) {
                         if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y)) {
                             //isMove = box.identifier(n, j, board[n], board);
-                            //Enviar n i j al servidor para el check
-                            z = j;
-                            
+                            //if (!hasMoved) {
+                                z = j;
+                            //}
                             while (!received) {
                                 if (!sent) sent = true;
                             }
 
                             if (isMove) {
-                                if (!hasMoved) {
-                                    game_end = updateboard(n, z, rectangle, sprite);
+                              //  if (!hasMoved) {
+                                std::cout << "1111111111111" << std::endl;
+                                    game_end = updateboard(n, j, rectangle, sprite);
                                     isMove = false;
-                                    if (game_end) { window.close(); }
-                                }
-                                else {
-                                    //Al mover ficha en el turno de las negras llama a Abort()
-                                    
-                                    firstpos = rectangle[z].getPosition();
-                                    v = spritepositions[z];
-                                    game_end = updateboard(m, z, rectangle, sprite);
-                                    //turn++;
-                                    //hasMoved = false;
-                                    //received = false;
-                                    isMove = false;
-                                }
-                                q[z] = spritepositions[z];
+                               //}
+                               // else {
+                               //     //Al mover ficha en el turno de las negras llama a Abort()
+                               //     
+                               //     firstpos = rectangle[z].getPosition();
+                               //     v = spritepositions[z];
+                               //     game_end = updateboard(m, z, rectangle, sprite);
+                               //     n = z;
+                               //     j = z;
+                               //     //turn++;
+                               //     //hasMoved = false;
+                               //     //received = false;
+                               //     isMove = false;
+                               // }
+                                if (game_end) { window.close(); }
+                                q[j] = spritepositions[j];
                             }
                             
                             // Filling board colors

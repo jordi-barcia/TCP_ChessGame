@@ -97,7 +97,7 @@ void Client::ClientMain()
 			if (rcvMessage == "Movimiento Contrario Correcto") {
 				receivedMovement = true;
 				rcvMessage.clear();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::this_thread::sleep_for(std::chrono::milliseconds(115));
 			}
 			if (rcvMessage == "Movimiento Correcto") {
 				game.isMove = true;
@@ -120,28 +120,31 @@ void Client::ClientMain()
 					game.m = stoi(temporalMessage);
 					firstMessage = true;
 					rcvMessage.clear();
-					std::this_thread::sleep_for(std::chrono::milliseconds(50));
+					std::this_thread::sleep_for(std::chrono::milliseconds(105));
 				}
 				if (firstMessage && rcvMessage != "Enviados") {
 					std::cout << temporalMessage << std::endl;
 					game.z = stoi(temporalMessage);
 					rcvMessage.clear();
-					std::this_thread::sleep_for(std::chrono::milliseconds(50));
+					std::this_thread::sleep_for(std::chrono::milliseconds(105));
 				}
-				if (rcvMessage == "Enviados") {
-					firstMessage = false;
-					receivedMovement = false;
+				if (rcvMessage =="Enviados") {
+					std::cout << temporalMessage << std::endl;
 					rcvMessage.clear();
-					std::this_thread::sleep_for(std::chrono::milliseconds(50));
+					std::this_thread::sleep_for(std::chrono::milliseconds(105));
+					
 				}
+				firstMessage = false;
+				receivedMovement = false;
 				game.hasMoved = true;
-				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+				std::this_thread::sleep_for(std::chrono::milliseconds(20));
 				game.cap = 1;
-				std::this_thread::sleep_for(std::chrono::milliseconds(50));
+				std::this_thread::sleep_for(std::chrono::milliseconds(20));
 				game.isMove = true;
 				game.received = true;
 				doneSent = false;
 				game.sent = false;
+				
 			}
 			rcvMessage.clear();
 		}
@@ -164,6 +167,7 @@ void Client::ClientMain()
 		if (game.sent && !doneSent) {
 			sendMessage = "CheckPosition";
 			send_pkt(&socket, sendMessage);
+			sendMessage.clear();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 			std::string s_n = std::to_string(game.n);
@@ -172,11 +176,12 @@ void Client::ClientMain()
 
 			std::string s_j = std::to_string(game.z);
 			send_pkt(&socket, s_j);
-			std::this_thread::sleep_for(std::chrono::milliseconds(110));
+			std::this_thread::sleep_for(std::chrono::milliseconds(105));
 			std::cout << s_n + " : " + s_j << std::endl;
 
 			sendMessage = "Enviados";
 			send_pkt(&socket, sendMessage);
+			sendMessage.clear();
 			doneSent = true;
 		}
 	}
