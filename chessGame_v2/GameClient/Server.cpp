@@ -219,9 +219,8 @@ void Server::ServerMain()
 					std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				}
 				if (rcvMessage == s_port + ":Enviados") {
-					std::cout << "ENVIADOOO" << std::endl;
+					std::cout << "ENVIADO" << std::endl;
 					s_game.run(temp_n, temp_j);
-					std::cout << "ENVIADOOO222222" << std::endl;
 					firstMessage = false;
 					checkPositions = false;
 					rcvMessage.clear();
@@ -271,7 +270,7 @@ void Server::ServerMain()
 		}
 		
 
-		if (s_game.resetTimer && s_game.done) {
+		if (s_game.isMove && s_game.done) {
 			std::cout << "ENTRO ENVIO MOVIMIENTO" << std::endl;
 			std::cout << sockets.size() << std::endl;
 			for (int i = 0; i < sockets.size(); i++)
@@ -279,10 +278,8 @@ void Server::ServerMain()
 				std::cout << i << std::endl;
 				if (sockets[i]->getRemotePort() == port && temp == -1)
 				{
-					std::cout << "ppppppppppp" << std::endl;
 					temp = i;
 					packageControl(sockets[i], "Movimiento Correcto");
-					std::cout << "ttttttttt" << std::endl;
 					timers[i].init(inGameDuration);
 				
 					//std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -321,7 +318,7 @@ void Server::ServerMain()
 			temp = -1;
 			std::cout << "MOVIMIENTOS ENVIADOS" << std::endl;
 		}
-		if (!s_game.resetTimer && s_game.done) {
+		if (!s_game.isMove && s_game.done) {
 			for (int i = 0; i < sockets.size(); i++)
 			{
 				if (sockets[i]->getRemotePort() == port && temp == -1)
@@ -329,14 +326,14 @@ void Server::ServerMain()
 					temp = i;
 					packageControl(sockets[i], "Movimiento Incorrecto");
 				}
-				for (int j = 0; j < sockets.size(); j++)
-				{
-					if (temp != j) {
-						if (IDgames[j] == IDgames[temp]) {
-							packageControl(sockets[i], "Movimiento Incorrecto");
-						}
-					}
-				}
+				//for (int j = 0; j < sockets.size(); j++)
+				//{
+				//	if (temp != j) {
+				//		if (IDgames[j] == IDgames[temp]) {
+				//			packageControl(sockets[i], "Movimiento Incorrecto");
+				//		}
+				//	}
+				//}
 			}
 			s_game.resetTimer = false;
 			s_game.done = false;

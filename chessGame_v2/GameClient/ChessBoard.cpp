@@ -67,30 +67,32 @@ bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
     secondpos = rectangle[j].getPosition();
     int spritepos = spritepositions[n];
     bool game_finished;
-    turn++;
-    std::cout << "NEXT TURN" << std::endl;
-    cc = spritepositions[j];
-    if (j != n) {
-        sprite[spritepos].setPosition(secondpos);
-        sprite[cc].setPosition(100000000, 100000000);
-        int suppos = spritepositions[j];
-        spritepositions[j] = spritepositions[n];
-        spritepositions[n] = 64;
-        if (board[j] == -5 || board[j] == 5) {
-            // Game finished
-            return true;
-        }
-        if (j <= 63 & j >= 56 & board[n] == -6) {
-            board[j] = -4;
-        }
-        else if (j >= 0 & j <= 7 & board[n] == 6) {
-            board[j] = 4;
-        }
-        else {
-            board[j] = board[n];
-            board[n] = 0;
-        }
-        n = j;
+    if (correct) {
+        turn++;
+       std::cout << "NEXT TURN" << std::endl;
+       cc = spritepositions[j];
+       if (j != n) {
+           sprite[spritepos].setPosition(secondpos);
+           sprite[cc].setPosition(100000000, 100000000);
+           int suppos = spritepositions[j];
+           spritepositions[j] = spritepositions[n];
+           spritepositions[n] = 64;
+           if (board[j] == -5 || board[j] == 5) {
+               // Game finished
+               return true;
+           }
+           if (j <= 63 & j >= 56 & board[n] == -6) {
+               board[j] = -4;
+           }
+           else if (j >= 0 & j <= 7 & board[n] == 6) {
+               board[j] = 4;
+           }
+           else {
+               board[j] = board[n];
+               board[n] = 0;
+           }
+           n = j;
+       }
     }
     hasMoved = false;
     received = false;
@@ -168,6 +170,7 @@ void ChessBoard::run()
                     v = spritepositions[z];
                     game_end = updateboard(m, z, rectangle, sprite);
                     isMove = false;
+
                     q[z] = spritepositions[z];
                 }
                 int counter = 0;
@@ -201,6 +204,7 @@ void ChessBoard::run()
                                 std::cout << "1111111111111" << std::endl;
                                     game_end = updateboard(n, j, rectangle, sprite);
                                     isMove = false;
+                                    
                                //}
                                // else {
                                //     //Al mover ficha en el turno de las negras llama a Abort()
@@ -216,9 +220,12 @@ void ChessBoard::run()
                                //     isMove = false;
                                // }
                                 if (game_end) { window.close(); }
-                                q[j] = spritepositions[j];
+                                
+                                if (correct) {
+                                    q[j] = spritepositions[j];
+                                }
                             }
-                            
+
                             // Filling board colors
                             int counter = 0;
                             for (int i = 0; i < 8; ++i) {

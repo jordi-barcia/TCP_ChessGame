@@ -24,8 +24,9 @@ class ServerGame
                     0, 0, 0, 0, 0, 0, 0, 0,
                     6, 6, 6, 6, 6, 6, 6, 6,
                     1, 2, 3, 4, 5, 3, 2, 1 };
-    bool isMove;
+   
 public:
+    bool isMove;
     bool resetTimer = false;
 	void run(int n, int j);
     bool done = false;

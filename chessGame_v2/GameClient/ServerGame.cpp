@@ -40,6 +40,7 @@ void ServerGame::run(int n, int j)
 		done = true;
 	}
 	else {
+        resetTimer = true;
 		done = true;
 	}
 

@@ -38,6 +38,7 @@ class ChessBoard{
     bool hasMoved = false;
     bool sent = false;
     bool received = false;
+    bool correct = false;
     unsigned int ID;
     int firstToPlay = -1;
     void loadtextures(Texture texture[64]);

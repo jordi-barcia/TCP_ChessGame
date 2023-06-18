@@ -100,6 +100,7 @@ void Client::ClientMain()
 				std::this_thread::sleep_for(std::chrono::milliseconds(115));
 			}
 			if (rcvMessage == "Movimiento Correcto") {
+				game.correct = true;
 				game.isMove = true;
 				game.received = true;
 				doneSent = false;
@@ -108,10 +109,15 @@ void Client::ClientMain()
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
 			if (rcvMessage == "Movimiento Incorrecto") {
-				game.isMove = false;
-				game.received = false;
+				game.correct = false;
+				game.cap = 1;
+				std::this_thread::sleep_for(std::chrono::milliseconds(20));
+				game.isMove = true;
+				game.received = true;
 				doneSent = false;
 				game.sent = false;
+				rcvMessage.clear();
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			}
 			if (receivedMovement) {
 
@@ -136,6 +142,7 @@ void Client::ClientMain()
 				}
 				firstMessage = false;
 				receivedMovement = false;
+				game.correct = true;
 				game.hasMoved = true;
 				std::this_thread::sleep_for(std::chrono::milliseconds(20));
 				game.cap = 1;
