@@ -32,7 +32,7 @@ class ChessBoard{
 
   public:  
     int cap = 0;
-    bool isMove, game_end;
+    bool isMove = false, game_end = false;
     int turn = 1;
     int n = 0, z = 0, m = 0;
     bool hasMoved = false;

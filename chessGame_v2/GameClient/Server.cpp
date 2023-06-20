@@ -72,7 +72,10 @@ void Server::acceptSocket(sf::TcpListener* dispatcher, std::vector<sf::TcpSocket
 			welcome(sock, s);
 			timer.init(duration);
 			timers.push_back(timer);
+			inGame.push_back(false);
 			std::cout << timers.size() << std::endl;
+			std::cout << inGame.size() << std::endl;
+
 		}
 	}
 }
@@ -106,11 +109,23 @@ void Server::timerDisconnection() {
 				mtx.lock();
 				if (createGames > 1) { //Significa que hay games creados
 					std::cout << "Cliente " << sockets[i]->getRemotePort() << " ha perdido por inactividad" << std::endl;
+					packageControl(sockets[i], "HAS PERDIDO!");
 					if (i % 2 == 0) { //Ha perdido un cliente par, por lo tanto, el primero de los 2 jugadores
 						std::cout << "Cliente " << sockets[i + 1]->getRemotePort() << " has ganado!" << std::endl;
+						packageControl(sockets[i + 1], "HAS GANADO!");
+						std::this_thread::sleep_for(std::chrono::milliseconds(50));
+						packageControl(sockets[i + 1], "Quieres jugar otra partida? Si/No");
+						newGame = true;
+						timers[i + 1].init(duration);
 					}
 					else {
 						std::cout << "Cliente " << sockets[i - 1]->getRemotePort() << " has ganado!" << std::endl;
+						packageControl(sockets[i - 1], "HAS GANADO!");
+						std::this_thread::sleep_for(std::chrono::milliseconds(50));
+						packageControl(sockets[i - 1], "Quieres jugar otra partida? Si/No");
+						newGame = true;
+						timers[i - 1].init(duration);
+
 					}
 					createGames -= 2;
 					std::this_thread::sleep_for(std::chrono::milliseconds(30));	
@@ -120,6 +135,7 @@ void Server::timerDisconnection() {
 				delete sockets[i];
 				sockets.erase(sockets.begin() + i);
 				timers.erase(timers.begin() + i);
+				inGame.erase(inGame.begin() + i);
 				std::cout << "Client disconnected. Total clients: " << sockets.size() << std::endl;
 				count--;
 				mtx.unlock();
@@ -181,6 +197,25 @@ void Server::ServerMain()
 				std::cout << "AAAAAAAAAAAAA" << std::endl;
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
+			if (rcvMessage == s_port + ":Si" && newGame) {
+				rcvMessage.clear();
+				newGame = false;
+				if (count == 1) {
+					count++;
+				}
+				if (count != 1) {
+					count = 1;
+				}
+				for (int i = 0; i < sockets.size(); i++)
+				{
+					if (sockets[i]->getRemotePort() == port)
+					{
+						// Cliente encontrado, ponemos que esta buscando partida otra vez
+						inGame[i] = false;
+					}
+				}
+
+			}
 			
 			//Gestionar la desconexion
 			if (rcvMessage == s_port + ":exit" )
@@ -194,6 +229,8 @@ void Server::ServerMain()
 						sockets[i]->disconnect();
 						delete sockets[i];
 						sockets.erase(sockets.begin() + i);
+						timers.erase(timers.begin() + i);
+						inGame.erase(inGame.begin() + i);
 						std::cout << "Client disconnected. Total clients: " << sockets.size() << std::endl;
 						count--;
 					}
@@ -244,25 +281,37 @@ void Server::ServerMain()
 
 		if (count == 2)
 		{
+			int temp1 = -1, temp2 = -1;
+			for (int i = 0; i < sockets.size(); i++) {
+				if (!inGame[i] && temp1 == -1) {
+					temp1 = i;
+					inGame[i] = true;
+				}
+				if (!inGame[i] && temp1 != -1) {
+					temp2 = i;
+					inGame[i] = true;
+				}
+			}
+			std::cout << "temp1 " << temp1 << " temp2 " << temp2 << std::endl;
 			//Creación de los games para los 2 clientes
 			int random = rand() % 2; //Valor random de 0-1 para escoger quien juega las fichas blancas o negras
 			std::string s_random = std::to_string(random);
-			packageControl(sockets[createGames], s_random);
+			packageControl(sockets[temp1], s_random);
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			timers[createGames].init(inGameDuration); //Reseteamos el temporizador del jugador y le ponemos el tiempo de desconexión de la partida
-			packageControl(sockets[createGames], "Game");
+			timers[temp1].init(inGameDuration); //Reseteamos el temporizador del jugador y le ponemos el tiempo de desconexión de la partida
+			packageControl(sockets[temp1], "Game");
 			IDgames.push_back(ID); //Guardamos la ID del game en el vector de IDgames
 			createGames++;
 
 			if (s_random == "0") {
-				packageControl(sockets[createGames], "1");
+				packageControl(sockets[temp2], "1");
 			}
 			else {
-				packageControl(sockets[createGames], "0");
+				packageControl(sockets[temp2], "0");
 			}
-			timers[createGames].init(inGameDuration); //Reseteamos el temporizador del jugador y le ponemos el tiempo de desconexión de la partida
+			timers[temp2].init(inGameDuration); //Reseteamos el temporizador del jugador y le ponemos el tiempo de desconexión de la partida
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			packageControl(sockets[createGames], "Game");
+			packageControl(sockets[temp2], "Game");
 			IDgames.push_back(ID); //Guardamos la ID del game en el vector de IDgames
 			createGames++;
 			ID++;

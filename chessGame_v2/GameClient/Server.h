@@ -20,10 +20,12 @@ class Server
 	std::string temporalMessage;
 	int ID = 0;
 	std::vector<int>IDgames; // Vector de games para gestionar las partidas. 
+	std::vector<bool>inGame;
 	int count = 0;
 	int createGames = 0;
 	bool checkPositions = false;
 	bool firstMessage = false;
+	bool newGame = false;
 	int temp_n, temp_j;
 	int temp = -1;
 	ServerGame s_game;

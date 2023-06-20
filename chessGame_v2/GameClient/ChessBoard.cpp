@@ -6,7 +6,18 @@
 #include <fstream>
 
 void ChessBoard::loadtextures(Texture texture[64]) {
+    int spritepos[64] = { 0,1,2,3,4,5,6,7,
+                                8,9,10,11,12,13,14,15,
+                                64,64,64,64,64,64,64,64,
+                                64,64,64,64,64,64,64,64,
+                                64,64,64,64,64,64,64,64,
+                                64,64,64,64,64,64,64,64,
+                                48,49,50,51,52,53,54,55,
+                                56,57,58,59,60,61,62,63 };
+    
+
     for (int i = 0; i < 64; i++) {
+        spritepositions[i] = spritepos[i];
         if (spritepositions[i] == 0 || spritepositions[i] == 7)
             texture[i].loadFromFile("images/blackRook.png");
         if (spritepositions[i] == 1 || spritepositions[i] == 6)
@@ -103,6 +114,15 @@ bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
 void ChessBoard::run()
 {
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGTH), "Chess The Game Of Kings!");
+    int b[64] = { -1,-2,-3,-4,-5,-3,-2,-1,
+                    -6,-6,-6,-6,-6,-6,-6,-6,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    6, 6, 6, 6, 6, 6, 6, 6,
+                    1, 2, 3, 4, 5, 3, 2, 1 };
+
     sf::RectangleShape rectangle[64];
     sf::Texture texture[65];
     sf::Sprite sprite[65];
@@ -113,8 +133,10 @@ void ChessBoard::run()
     Vector2f firstpos, secondpos;
     int v; int q[64];
     
-    for (int j = 0; j < 64; ++j)
+    for (int j = 0; j < 64; ++j) {
         q[j] = 64;
+        board[j] = b[j];
+    }
     Vector2i pos;
     while (window.isOpen())
     {
@@ -242,6 +264,7 @@ void ChessBoard::run()
                     cap = 0;
                 }
         }
+        if (game_end) { window.close(); }
         window.clear();
         for (int j = 0; j < 64; ++j)
             window.draw(rectangle[j]);

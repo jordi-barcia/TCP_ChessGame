@@ -15,6 +15,7 @@ class Client
 	bool doneSent = false;
 	bool receivedMovement = false;
 	bool firstMessage = false;
+	bool newGame = false;
 	std::string temporalMessage;
 public:
 	void GetLineFromCin_t(std::string* mssg, bool* exit);

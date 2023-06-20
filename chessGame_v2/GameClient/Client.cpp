@@ -153,6 +153,14 @@ void Client::ClientMain()
 				game.sent = false;
 				
 			}
+			
+			if (rcvMessage == "Quieres jugar otra partida? Si/No") {
+				newGame = true;
+				game.game_end = true;
+				game.firstToPlay = -1;
+				rcvMessage.clear();
+			}
+
 			rcvMessage.clear();
 		}
 
@@ -163,6 +171,34 @@ void Client::ClientMain()
 					//Desconexión
 					send_pkt(&socket, sendMessage);
 					sendMessage.clear();
+				}
+				else if (sendMessage == "Si" && newGame) {
+					//Ponerlo en espera para otro game
+					std::cout << "waiting for opponent..." << std::endl;
+					//Reseteamos todas las variables del Game
+					newGame = false;
+					game.game_end = false;
+					game.cap = 0;
+					game.isMove = false;
+					game.turn = 1;
+					game.n = 0;
+					game.z = 0;
+					game.m = 0;
+					game.hasMoved = false;
+					game.sent = false;
+					game.received = false;
+					game.correct = false;
+					doneSent = false;
+
+					send_pkt(&socket, sendMessage);
+					sendMessage.clear();
+				}
+				else if (sendMessage == "No" && newGame) {
+					//Desconexión
+					newGame = false;
+					send_pkt(&socket, sendMessage);
+					sendMessage.clear();
+					
 				}
 				else {
 					send_pkt(&socket, sendMessage);
