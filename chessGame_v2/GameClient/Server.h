@@ -10,6 +10,7 @@
 #include "ChessBoard.h"
 #include <time.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "Timer.h"
 #include "ServerGame.h"
 
@@ -28,7 +29,10 @@ class Server
 	bool newGame = false;
 	int temp_n, temp_j;
 	int temp = -1;
+	int socketWinner = -1;
+	int gameWinner = -1;
 	ServerGame s_game;
+	std::vector<ServerGame> s_games;
 
 	//Timer
 	Timer timer;
@@ -48,5 +52,6 @@ public:
 	void packageControl(sf::TcpSocket* sock, std::string mssg); // Funcion para enviar un mensaje a un solo cliente. 
 	void ServerMain(); // Main principal del Servidor donde gestiona todas las funciones anteriores. 
 	void timerDisconnection(); // Funcion que nos permite hacer una cuenta atras para desconnectar cada uno de los clientes. 
+	void winnerGame(int i, int j);
 };
 

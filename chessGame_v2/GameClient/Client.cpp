@@ -79,9 +79,9 @@ void Client::ClientMain()
 				port = socket.getLocalPort();
 				game.ID = port;
 				std::string s_port = std::to_string(game.ID);
-				std::cout << s_port << std::endl; // SUBJETIVO A SER BORRADO
-				std::thread game(&ChessBoard::run, &game);
-				game.detach();
+				std::cout << s_port << std::endl;
+				std::thread gameRun(&ChessBoard::run, &game);
+				gameRun.detach();
 			}
 			if (rcvMessage == "1") { // Si el cliente es "1" sera las piezas BLANCAS.
 				game.firstToPlay = 1;
@@ -91,7 +91,7 @@ void Client::ClientMain()
 				game.firstToPlay = 0;
 				std::cout << game.firstToPlay << std::endl;
 			}
-			else if (rcvMessage != "Game") {
+			else if (rcvMessage != "Game" && rcvMessage != "Quieres jugar otra partida? Si/No") {
 				std::cout << rcvMessage << std::endl;
 			}
 			if (rcvMessage == "Movimiento Contrario Correcto") {
@@ -155,6 +155,7 @@ void Client::ClientMain()
 			}
 			
 			if (rcvMessage == "Quieres jugar otra partida? Si/No") {
+				std::cout << rcvMessage << std::endl;
 				newGame = true;
 				game.game_end = true;
 				game.firstToPlay = -1;
@@ -173,9 +174,7 @@ void Client::ClientMain()
 					sendMessage.clear();
 				}
 				else if (sendMessage == "Si" && newGame) {
-					//Ponerlo en espera para otro game
-					std::cout << "waiting for opponent..." << std::endl;
-					//Reseteamos todas las variables del Game
+					//Reseteamos todas las variables del Game y lo ponemos en espera para otro game
 					newGame = false;
 					game.game_end = false;
 					game.cap = 0;
@@ -189,14 +188,13 @@ void Client::ClientMain()
 					game.received = false;
 					game.correct = false;
 					doneSent = false;
-
 					send_pkt(&socket, sendMessage);
 					sendMessage.clear();
 				}
 				else if (sendMessage == "No" && newGame) {
 					//Desconexión
 					newGame = false;
-					send_pkt(&socket, sendMessage);
+					send_pkt(&socket, "exit");
 					sendMessage.clear();
 					
 				}

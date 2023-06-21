@@ -1,9 +1,7 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <fstream>
-
-using namespace sf;
+#include "Pieces.h"
 using namespace std;
 
 class ServerGame
@@ -27,9 +25,14 @@ class ServerGame
    
 public:
     bool isMove;
+    int gameID = 0;
     bool resetTimer = false;
 	void run(int n, int j);
     bool done = false;
-    bool updateboard(int n, int j);
+    bool checkMovement = false;
+    bool win = false;
+    Identity box;
+    void updateboard(int n, int j);
+    void init();
 };
 

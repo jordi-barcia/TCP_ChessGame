@@ -1,23 +1,14 @@
 #pragma once
+#include "ChessBoard.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "Pieces.h"
-#include "ChessBoard.h"
 #include <fstream>
+#include "Pieces.h"
+
 
 void ChessBoard::loadtextures(Texture texture[64]) {
-    int spritepos[64] = { 0,1,2,3,4,5,6,7,
-                                8,9,10,11,12,13,14,15,
-                                64,64,64,64,64,64,64,64,
-                                64,64,64,64,64,64,64,64,
-                                64,64,64,64,64,64,64,64,
-                                64,64,64,64,64,64,64,64,
-                                48,49,50,51,52,53,54,55,
-                                56,57,58,59,60,61,62,63 };
-    
 
     for (int i = 0; i < 64; i++) {
-        spritepositions[i] = spritepos[i];
         if (spritepositions[i] == 0 || spritepositions[i] == 7)
             texture[i].loadFromFile("images/blackRook.png");
         if (spritepositions[i] == 1 || spritepositions[i] == 6)
@@ -47,6 +38,7 @@ void ChessBoard::loadtextures(Texture texture[64]) {
 
 
 void ChessBoard::loadboard(Texture texture[64], RectangleShape rectangle[64], Sprite sprite[64]) {
+
     for (int j = 0; j < 64; j++) {
         sprite[j].setTexture(texture[j]);
         sprite[j].setScale(1.7f, 1.7f);
@@ -72,7 +64,7 @@ void ChessBoard::loadboard(Texture texture[64], RectangleShape rectangle[64], Sp
 }
 
 
-bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf::Sprite sprite[65]) {
+void ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf::Sprite sprite[65]) {
     int cc;
     Vector2f secondpos;
     secondpos = rectangle[j].getPosition();
@@ -80,7 +72,7 @@ bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
     bool game_finished;
     if (correct) {
         turn++;
-       std::cout << "NEXT TURN" << std::endl;
+        std::cout << "NEXT TURN" << std::endl;
        cc = spritepositions[j];
        if (j != n) {
            sprite[spritepos].setPosition(secondpos);
@@ -90,7 +82,7 @@ bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
            spritepositions[n] = 64;
            if (board[j] == -5 || board[j] == 5) {
                // Game finished
-               return true;
+               //return true;
            }
            if (j <= 63 & j >= 56 & board[n] == -6) {
                board[j] = -4;
@@ -104,25 +96,19 @@ bool ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
            }
            n = j;
        }
+      
     }
+    correct = false;
     hasMoved = false;
     received = false;
-    return false; // Game not finished
+    //return false; // Game not finished
 }
 
 
 void ChessBoard::run()
 {
+    init();
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGTH), "Chess The Game Of Kings!");
-    int b[64] = { -1,-2,-3,-4,-5,-3,-2,-1,
-                    -6,-6,-6,-6,-6,-6,-6,-6,
-                    0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0,
-                    6, 6, 6, 6, 6, 6, 6, 6,
-                    1, 2, 3, 4, 5, 3, 2, 1 };
-
     sf::RectangleShape rectangle[64];
     sf::Texture texture[65];
     sf::Sprite sprite[65];
@@ -132,17 +118,16 @@ void ChessBoard::run()
     int position;
     Vector2f firstpos, secondpos;
     int v; int q[64];
-    
+
     for (int j = 0; j < 64; ++j) {
         q[j] = 64;
-        board[j] = b[j];
     }
     Vector2i pos;
     while (window.isOpen())
     {
         pos = Mouse::getPosition(window);
         sf::Event event;
-        while (window.pollEvent(event))
+        while (window.pollEvent(event)|| hasMoved)
         {
             if (event.type == sf::Event::Closed) {
                 window.close();
@@ -190,10 +175,12 @@ void ChessBoard::run()
                     std::cout << "22222222222" << std::endl;
                     firstpos = rectangle[z].getPosition();
                     v = spritepositions[z];
-                    game_end = updateboard(m, z, rectangle, sprite);
+                    updateboard(m, z, rectangle, sprite);
                     isMove = false;
 
-                    q[z] = spritepositions[z];
+                    if (correct) {
+                        q[z] = spritepositions[z];
+                    }
                 }
                 int counter = 0;
                 for (int i = 0; i < 8; ++i) {
@@ -208,41 +195,26 @@ void ChessBoard::run()
                 cap = 0;
             }
 
-            if (cap != 0)
+            if (cap != 0) 
                 // New position
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     for (int j = 0; j < 64; ++j) {
                         if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y)) {
                             //isMove = box.identifier(n, j, board[n], board);
                             //if (!hasMoved) {
-                                z = j;
+                            z = j;
                             //}
                             while (!received) {
                                 if (!sent) sent = true;
                             }
 
                             if (isMove) {
-                              //  if (!hasMoved) {
+                                //  if (!hasMoved) {
                                 std::cout << "1111111111111" << std::endl;
-                                    game_end = updateboard(n, j, rectangle, sprite);
-                                    isMove = false;
-                                    
-                               //}
-                               // else {
-                               //     //Al mover ficha en el turno de las negras llama a Abort()
-                               //     
-                               //     firstpos = rectangle[z].getPosition();
-                               //     v = spritepositions[z];
-                               //     game_end = updateboard(m, z, rectangle, sprite);
-                               //     n = z;
-                               //     j = z;
-                               //     //turn++;
-                               //     //hasMoved = false;
-                               //     //received = false;
-                               //     isMove = false;
-                               // }
+                                updateboard(n, j, rectangle, sprite);
+ 
                                 if (game_end) { window.close(); }
-                                
+
                                 if (correct) {
                                     q[j] = spritepositions[j];
                                 }
@@ -263,6 +235,7 @@ void ChessBoard::run()
                     }
                     cap = 0;
                 }
+            
         }
         if (game_end) { window.close(); }
         window.clear();
@@ -275,3 +248,37 @@ void ChessBoard::run()
         window.display();
     }
 }
+
+void ChessBoard::init()
+{
+    int b[64] = { -1,-2,-3,-4,-5,-3,-2,-1,
+                    -6,-6,-6,-6,-6,-6,-6,-6,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    6, 6, 6, 6, 6, 6, 6, 6,
+                    1, 2, 3, 4, 5, 3, 2, 1 };
+    int spritepos[64] = { 0,1,2,3,4,5,6,7,
+                                8,9,10,11,12,13,14,15,
+                                64,64,64,64,64,64,64,64,
+                                64,64,64,64,64,64,64,64,
+                                64,64,64,64,64,64,64,64,
+                                64,64,64,64,64,64,64,64,
+                                48,49,50,51,52,53,54,55,
+                                56,57,58,59,60,61,62,63 };
+    for (int j = 0; j < 64; ++j) {
+        board[j] = b[j];
+        spritepositions[j] = spritepos[j];
+    }
+    cap = 0;
+    turn = 1;
+    n = 0, z = 0, m = 0;
+    hasMoved = false;
+    sent = false;
+    received = false;
+    correct = false;
+    isMove = false;
+    game_end = false;
+}    
+
