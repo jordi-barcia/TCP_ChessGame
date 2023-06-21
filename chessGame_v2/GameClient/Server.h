@@ -52,6 +52,6 @@ public:
 	void packageControl(sf::TcpSocket* sock, std::string mssg); // Funcion para enviar un mensaje a un solo cliente. 
 	void ServerMain(); // Main principal del Servidor donde gestiona todas las funciones anteriores. 
 	void timerDisconnection(); // Funcion que nos permite hacer una cuenta atras para desconnectar cada uno de los clientes. 
-	void winnerGame(int i, int j);
+	void winnerGame(int i, int j); // Recibimos quien ha ganado la partida y en que GAME y le enviamos un mensaje de VICTORIA/DERROTA a los jugadores y les preguntamos si quieren jugar otra partida
 };
 

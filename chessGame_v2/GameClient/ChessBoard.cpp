@@ -101,7 +101,6 @@ void ChessBoard::updateboard(int n, int j, sf::RectangleShape rectangle[64], sf:
     correct = false;
     hasMoved = false;
     received = false;
-    //return false; // Game not finished
 }
 
 
@@ -170,9 +169,8 @@ void ChessBoard::run()
                 
             }
 
-            if (hasMoved) {
+            if (hasMoved) { // Se actualiza el movimiento del jugador contrario al que ha hecho el movimiento. 
                 if (isMove) {
-                    std::cout << "22222222222" << std::endl;
                     firstpos = rectangle[z].getPosition();
                     v = spritepositions[z];
                     updateboard(m, z, rectangle, sprite);
@@ -200,17 +198,12 @@ void ChessBoard::run()
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     for (int j = 0; j < 64; ++j) {
                         if (rectangle[j].getGlobalBounds().contains(pos.x, pos.y)) {
-                            //isMove = box.identifier(n, j, board[n], board);
-                            //if (!hasMoved) {
                             z = j;
-                            //}
                             while (!received) {
                                 if (!sent) sent = true;
                             }
 
                             if (isMove) {
-                                //  if (!hasMoved) {
-                                std::cout << "1111111111111" << std::endl;
                                 updateboard(n, j, rectangle, sprite);
  
                                 if (game_end) { window.close(); }

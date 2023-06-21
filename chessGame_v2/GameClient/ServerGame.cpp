@@ -24,8 +24,6 @@ void ServerGame::init()
         board[j] = b[j];
         spritepositions[j] = spritepos[j];
     }
-    //board[64] = b[64];
-    //spritepositions[64] = spritepos[64];
     done = false;
     checkMovement = false;
     win = false;

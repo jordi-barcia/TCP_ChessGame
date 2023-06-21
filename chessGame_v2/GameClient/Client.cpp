@@ -94,12 +94,12 @@ void Client::ClientMain()
 			else if (rcvMessage != "Game" && rcvMessage != "Quieres jugar otra partida? Si/No") {
 				std::cout << rcvMessage << std::endl;
 			}
-			if (rcvMessage == "Movimiento Contrario Correcto") {
+			if (rcvMessage == "Movimiento Contrario Correcto") { // Actualizas el tablero cuando el jugador contrario hace un movimiento.
 				receivedMovement = true;
 				rcvMessage.clear();
 				std::this_thread::sleep_for(std::chrono::milliseconds(115));
 			}
-			if (rcvMessage == "Movimiento Correcto") {
+			if (rcvMessage == "Movimiento Correcto") { // El jugador local hace un movimiento y lo envia al servidor.  
 				game.correct = true;
 				game.isMove = true;
 				game.received = true;
@@ -108,7 +108,7 @@ void Client::ClientMain()
 				rcvMessage.clear();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
-			if (rcvMessage == "Movimiento Incorrecto") {
+			if (rcvMessage == "Movimiento Incorrecto") { // Se le notifica al cliente que el movimiento introducido no es valido. 
 				game.correct = false;
 				game.cap = 1;
 				std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -119,7 +119,7 @@ void Client::ClientMain()
 				rcvMessage.clear();
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			}
-			if (receivedMovement) {
+			if (receivedMovement) { // Se activa cuando el movimiento contrario es correcto y recibe las posiciones de la ficha que ha movido el rival
 
 				if (!firstMessage && rcvMessage != "Enviados") {
 					std::cout << temporalMessage << std::endl;
@@ -140,6 +140,7 @@ void Client::ClientMain()
 					std::this_thread::sleep_for(std::chrono::milliseconds(105));
 					
 				}
+				// Actualizamos variables del GAME para que pinte por pantalla el movimiento.
 				firstMessage = false;
 				receivedMovement = false;
 				game.correct = true;
@@ -154,11 +155,12 @@ void Client::ClientMain()
 				
 			}
 			
-			if (rcvMessage == "Quieres jugar otra partida? Si/No") {
+			if (rcvMessage == "Quieres jugar otra partida? Si/No") { // Una vez finalizada la partida, se le pregunta al cliente si quiere jugar otra vez
+				//Se borran los tableros de la pantalla
 				std::cout << rcvMessage << std::endl;
 				newGame = true;
 				game.game_end = true;
-				game.firstToPlay = -1;
+				game.firstToPlay = -1; 
 				rcvMessage.clear();
 			}
 
@@ -205,7 +207,7 @@ void Client::ClientMain()
 			}
 		}
 
-		if (game.sent && !doneSent) {
+		if (game.sent && !doneSent) { // Le enviamos al servidor el movimiento que se quiere hacer
 			sendMessage = "CheckPosition";
 			send_pkt(&socket, sendMessage);
 			sendMessage.clear();
@@ -226,9 +228,6 @@ void Client::ClientMain()
 			doneSent = true;
 		}
 	}
-
-	// When the application loop is broken, we have to release resourcesº
-	//socket.disconnect();
 }
 
 

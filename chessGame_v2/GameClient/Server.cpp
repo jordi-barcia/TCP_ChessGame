@@ -104,7 +104,6 @@ void Server::timerDisconnection() {
 	if (timers.size() > 0) {
 		for (int i = 0; i < timers.size(); i++) {
 			timers[i].update();
-			//std::cout << timers[i].temp << std::endl;
 			if (timers[i].temp <= 0) {
 				mtx.lock();
 				if (createGames >= 1) { //Significa que hay games creados
@@ -116,8 +115,8 @@ void Server::timerDisconnection() {
 						std::this_thread::sleep_for(std::chrono::milliseconds(50));
 						packageControl(sockets[i + 1], "Quieres jugar otra partida? Si/No");
 						newGame = true;
-						timers[i + 1].init(duration);
-						IDgames.erase(IDgames.begin() + i + 1);
+						timers[i + 1].init(duration); // Reiniciamos el timer de desconexion de los clientes
+						IDgames.erase(IDgames.begin() + i + 1); // Borramos las ID's del GAME
 						IDgames.erase(IDgames.begin() + i);
 					}
 					else {
@@ -126,14 +125,15 @@ void Server::timerDisconnection() {
 						std::this_thread::sleep_for(std::chrono::milliseconds(50));
 						packageControl(sockets[i - 1], "Quieres jugar otra partida? Si/No");
 						newGame = true;
-						timers[i - 1].init(duration);
-						IDgames.erase(IDgames.begin() + i);
+						timers[i - 1].init(duration); // Reiniciamos el timer de desconexion de los clientes
+						IDgames.erase(IDgames.begin() + i); // Borramos las ID's del GAME
 						IDgames.erase(IDgames.begin() + i - 1);
 
 					}
 					createGames--;
 					std::this_thread::sleep_for(std::chrono::milliseconds(30));	
 				}
+				// Desconectamos al cliente inactivo.
 				packageControl(sockets[i], "exit");
 				sockets[i]->disconnect();
 				delete sockets[i];
@@ -157,7 +157,7 @@ void Server::timerDisconnection() {
 	}
 }
 
-void Server::winnerGame(int i, int j)
+void Server::winnerGame(int i, int j) // Recibimos quien ha ganado la partida y en que GAME y le enviamos un mensaje de VICTORIA/DERROTA a los jugadores y les preguntamos si quieren jugar otra partida
 {
 	if (socketWinner != -1 && !s_games[j].done) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(150));
@@ -166,14 +166,14 @@ void Server::winnerGame(int i, int j)
 		packageControl(sockets[i], "HAS GANADO!");
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		packageControl(sockets[i], "Quieres jugar otra partida? Si/No");
-		timers[i].init(duration);
+		timers[i].init(duration); // Reiniciamos el timer de desconexion de los clientes
 		if (i % 2 == 0) { //Ha ganado un cliente par, por lo tanto, el primero de los 2 jugadores
 			std::cout << "Cliente " << sockets[i + 1]->getRemotePort() << " has perdido!" << std::endl;
 			packageControl(sockets[i + 1], "HAS PERDIDO!");
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			packageControl(sockets[i + 1], "Quieres jugar otra partida? Si/No");
-			timers[i + 1].init(duration);
-			IDgames.erase(IDgames.begin() + i + 1);
+			timers[i + 1].init(duration); 
+			IDgames.erase(IDgames.begin() + i + 1); // Borramos las ID's de GAME
 			IDgames.erase(IDgames.begin() + i);
 		}
 		else {
@@ -182,14 +182,15 @@ void Server::winnerGame(int i, int j)
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			packageControl(sockets[i - 1], "Quieres jugar otra partida? Si/No");
 			timers[i - 1].init(duration);
-			IDgames.erase(IDgames.begin() + i);
+			IDgames.erase(IDgames.begin() + i); // Borramos las ID's de GAME
 			IDgames.erase(IDgames.begin() + i - 1);
 
 		}
 		createGames--;
 		std::this_thread::sleep_for(std::chrono::milliseconds(30));
+		// Borramos el juego del vector de GAMES
 		if (i < s_games.size()) {
-			s_games.erase(s_games.begin() + i);
+			s_games.erase(s_games.begin() + i); 
 			socketWinner = -1;
 		}
 		else {
@@ -199,7 +200,6 @@ void Server::winnerGame(int i, int j)
 		count--;
 		newGame = true;
 		mtx.unlock();
-		//std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
 
@@ -250,13 +250,12 @@ void Server::ServerMain()
 		// Logic for receiving
 		if (rcvMessage.size() > 0) 
 		{
-			if (rcvMessage == s_port + ":CheckPosition") {
+			if (rcvMessage == s_port + ":CheckPosition") { // Si el servidor recibe el primer mensaje del cliente, preparamos al servidor para recibir el movimiento
 				checkPositions = true;
 				rcvMessage.clear();
-				std::cout << "AAAAAAAAAAAAA" << std::endl;
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
-			if (rcvMessage == s_port + ":Si" && newGame) {
+			if (rcvMessage == s_port + ":Si" && newGame) { // Si recibimos un "Si" le ponemos que no esta en partida y a la espera de un rival. 
 				rcvMessage.clear();
 				if (count == 1) {
 					count++;
@@ -302,21 +301,21 @@ void Server::ServerMain()
 				sendMessage = rcvMessage;
 				rcvMessage.clear();
 			}	
-			if (checkPositions) {
-				if (!firstMessage && rcvMessage != s_port + ":Enviados") {
+			if (checkPositions) { // Recibimos el movimiento del cliente por partes. 
+				if (!firstMessage && rcvMessage != s_port + ":Enviados") { // Recibimos la coordenada "n" y la guardamos en una variable temporal
 					std::cout << rcvMessage << std::endl;
 					temp_n = stoi(temporalMessage);
 					firstMessage = true;
 					rcvMessage.clear();
 					std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				}
-				if (firstMessage && rcvMessage != s_port + ":Enviados") {
+				if (firstMessage && rcvMessage != s_port + ":Enviados") { // Recibimos la coordenada "j" y la guardamos en una variable temporal
 					std::cout << rcvMessage << std::endl;
 					temp_j = stoi(temporalMessage);
 					rcvMessage.clear();
 					std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				}
-				if (rcvMessage == s_port + ":Enviados") {
+				if (rcvMessage == s_port + ":Enviados") { // Una vez recibidas las coordenadas si el cliente nos confirma que ha enviado todas las coordenadas, buscamos en que game esta ese cliente y comprobamos su movimiento
 					std::cout << "ENVIADO" << std::endl;
 					for (int i = 0; i < sockets.size(); i++)
 					{
@@ -324,13 +323,11 @@ void Server::ServerMain()
 						{
 							for (int j = 0; j < s_games.size(); j++) {
 
-								if (IDgames[i] == s_games[j].gameID) {
+								if (IDgames[i] == s_games[j].gameID) { // Comprobamos que la ID del jugador sea la misma ID del GAME
 									s_games[j].run(temp_n, temp_j);
 								}
 
-								//std::this_thread::sleep_for(std::chrono::milliseconds(20));
-
-								if (s_games[j].win) {
+								if (s_games[j].win) { // Si el jugador mata al rei contrario guardamos las variables de que jugador ha ganado y en que partida para enviar el mensaje al ganador
 									socketWinner = i;
 									gameWinner = j;
 									std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -338,7 +335,6 @@ void Server::ServerMain()
 							}
 						}
 					}
-					//s_game.run(temp_n, temp_j);
 					firstMessage = false;
 					checkPositions = false;
 					rcvMessage.clear();
@@ -360,10 +356,10 @@ void Server::ServerMain()
 			}
 		}
 
-		if (count == 2)
+		if (count == 2) // Si es "2" quiere decir que dos personas estan buscando partida
 		{
 			int temp1 = -1, temp2 = -1;
-			for (int i = 0; i < sockets.size(); i++) {
+			for (int i = 0; i < sockets.size(); i++) { // Buscamos en el vector de sockets que 2 personas estan buscando partida
 				if (!inGame[i] && temp1 == -1) {
 					temp1 = i;
 					inGame[i] = true;
@@ -404,7 +400,7 @@ void Server::ServerMain()
 
 		}
 		
-		for (int k = 0; k < s_games.size(); k++) {
+		for (int k = 0; k < s_games.size(); k++) { // Buscamos en que GAME se tiene que enviar la validacion del movimiento
 			if (s_games[k].isMove && s_games[k].done) {
 				std::cout << "ENTRO ENVIO MOVIMIENTO" << std::endl;
 				std::cout << sockets.size() << std::endl;
@@ -417,16 +413,6 @@ void Server::ServerMain()
 						packageControl(sockets[i], "Movimiento Correcto");
 						timers[i].init(inGameDuration);
 
-						//std::this_thread::sleep_for(std::chrono::milliseconds(100));
-						//
-						//std::string s_n = std::to_string(temp_n);
-						//packageControl(sockets[i], s_n);
-						//std::this_thread::sleep_for(std::chrono::milliseconds(100));
-						//
-						//std::string s_j = std::to_string(temp_j);
-						//packageControl(sockets[i], s_j);
-						//std::this_thread::sleep_for(std::chrono::milliseconds(110));
-						//std::cout << s_n + " : " + s_j << std::endl;
 						for (int j = 0; j < sockets.size(); j++)
 						{
 							if (temp != j) {
@@ -461,14 +447,6 @@ void Server::ServerMain()
 						temp = i;
 						packageControl(sockets[i], "Movimiento Incorrecto");
 					}
-					//for (int j = 0; j < sockets.size(); j++)
-					//{
-					//	if (temp != j) {
-					//		if (IDgames[j] == IDgames[temp]) {
-					//			packageControl(sockets[i], "Movimiento Incorrecto");
-					//		}
-					//	}
-					//}
 				}
 				s_games[k].resetTimer = false;
 				s_games[k].done = false;

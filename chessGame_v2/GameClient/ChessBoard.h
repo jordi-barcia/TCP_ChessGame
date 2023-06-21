@@ -45,5 +45,5 @@ class ChessBoard{
     void loadboard(Texture texture[64],RectangleShape rectangle[64],Sprite sprite[64]);
     void updateboard(int n, int j, sf::RectangleShape rectangle[64], sf::Sprite sprite[65]);
     void run();
-    void init();
+    void init(); // Se inicializan las variables antes de iniciar la partida por si el mismo jugador quiere jugar otra partida para asi reiniciar el tablero
 };
