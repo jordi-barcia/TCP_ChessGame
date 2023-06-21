@@ -402,7 +402,6 @@ void Server::ServerMain()
 		
 		for (int k = 0; k < s_games.size(); k++) { // Buscamos en que GAME se tiene que enviar la validacion del movimiento
 			if (s_games[k].isMove && s_games[k].done) {
-				std::cout << "ENTRO ENVIO MOVIMIENTO" << std::endl;
 				std::cout << sockets.size() << std::endl;
 				for (int i = 0; i < sockets.size(); i++)
 				{
@@ -437,7 +436,6 @@ void Server::ServerMain()
 				s_games[k].resetTimer = false;
 				s_games[k].done = false;
 				temp = -1;
-				std::cout << "MOVIMIENTOS ENVIADOS" << std::endl;
 			}
 			if (!s_games[k].isMove && s_games[k].done) {
 				for (int i = 0; i < sockets.size(); i++)
