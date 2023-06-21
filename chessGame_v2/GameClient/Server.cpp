@@ -326,7 +326,6 @@ void Server::ServerMain()
 
 								if (IDgames[i] == s_games[j].gameID) {
 									s_games[j].run(temp_n, temp_j);
-									std::cout << "run" << std::endl;
 								}
 
 								//std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -492,6 +491,9 @@ void Server::ServerMain()
 			timers.erase(timers.begin() + i);
 			inGame.erase(inGame.begin() + i);
 			IDgames.erase(IDgames.begin() + i);
+			if (s_games.size() != 0) {
+				s_games.pop_back();
+			}
 		}
 		if (sockets.size() == 0) {
 			break;
