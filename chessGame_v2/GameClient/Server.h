@@ -27,7 +27,9 @@ class Server
 	bool checkPositions = false;
 	bool firstMessage = false;
 	bool newGame = false;
-	int temp_n, temp_j;
+	int temp_n = -1, temp_j = -1;
+	int last_n = 0, last_j = 0;
+	int check = 0;
 	int temp = -1;
 	int socketWinner = -1;
 	int gameWinner = -1;

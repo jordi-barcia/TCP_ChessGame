@@ -30,7 +30,7 @@ void Client::receive_and_return_cl(sf::TcpSocket* sock, sf::Packet p, std::strin
 			temporalMessage = mssg_temp;
 			p.clear();
 			mssg->assign(mssg_temp);
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 	}
 }

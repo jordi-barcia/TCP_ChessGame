@@ -25,7 +25,7 @@ void Server::receive_and_return(std::vector<sf::TcpSocket*>* sockets, std::strin
 				temporalMessage = mssg_temp;
 				mssg_temp = s_port + ":" + mssg_temp;
 				mssg->assign(mssg_temp);
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				//std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			}
 		}
 		mtx.unlock();
@@ -253,7 +253,7 @@ void Server::ServerMain()
 			if (rcvMessage == s_port + ":CheckPosition") { // Si el servidor recibe el primer mensaje del cliente, preparamos al servidor para recibir el movimiento
 				checkPositions = true;
 				rcvMessage.clear();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				//std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
 			if (rcvMessage == s_port + ":Si" && newGame) { // Si recibimos un "Si" le ponemos que no esta en partida y a la espera de un rival. 
 				rcvMessage.clear();
@@ -302,20 +302,34 @@ void Server::ServerMain()
 				rcvMessage.clear();
 			}	
 			if (checkPositions) { // Recibimos el movimiento del cliente por partes. 
-				if (!firstMessage && rcvMessage != s_port + ":Enviados") { // Recibimos la coordenada "n" y la guardamos en una variable temporal
+				if (!firstMessage && temporalMessage != "CheckPosition" && temporalMessage != "Enviados") { // Recibimos la coordenada "n" y la guardamos en una variable temporal
 					std::cout << rcvMessage << std::endl;
-					temp_n = stoi(temporalMessage);
-					firstMessage = true;
-					rcvMessage.clear();
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					if (temporalMessage == "") temporalMessage = "0";
+
+					if (stoi(temporalMessage) != last_n) {
+						temp_n = stoi(temporalMessage);
+						last_n = temp_n;
+						rcvMessage.clear();
+						firstMessage = true;
+						check++;
+					}
+
+					//std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				}
-				if (firstMessage && rcvMessage != s_port + ":Enviados") { // Recibimos la coordenada "j" y la guardamos en una variable temporal
+				else if (firstMessage && temporalMessage != "Enviados") { // Recibimos la coordenada "j" y la guardamos en una variable temporal
 					std::cout << rcvMessage << std::endl;
-					temp_j = stoi(temporalMessage);
-					rcvMessage.clear();
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					if (temporalMessage == "") temporalMessage = "0";
+
+					if (stoi(temporalMessage) != last_j && stoi(temporalMessage) != temp_n) {
+						temp_j = stoi(temporalMessage);
+						last_j = temp_j;
+						rcvMessage.clear();
+						check++;
+					}
+
+					//std::this_thread::sleep_for(std::chrono::milliseconds(105));
 				}
-				if (rcvMessage == s_port + ":Enviados") { // Una vez recibidas las coordenadas si el cliente nos confirma que ha enviado todas las coordenadas, buscamos en que game esta ese cliente y comprobamos su movimiento
+				else if (rcvMessage == s_port + ":Enviados") { // Una vez recibidas las coordenadas si el cliente nos confirma que ha enviado todas las coordenadas, buscamos en que game esta ese cliente y comprobamos su movimiento
 					std::cout << "ENVIADO" << std::endl;
 					for (int i = 0; i < sockets.size(); i++)
 					{
@@ -324,7 +338,16 @@ void Server::ServerMain()
 							for (int j = 0; j < s_games.size(); j++) {
 
 								if (IDgames[i] == s_games[j].gameID) { // Comprobamos que la ID del jugador sea la misma ID del GAME
-									s_games[j].run(temp_n, temp_j);
+									if (check >= 2) {
+										s_games[j].run(temp_n, temp_j);
+										check = 0;
+									}
+									else {
+										s_games[j].isMove = false;
+										s_games[j].resetTimer = true;
+										s_games[j].done = true;
+										check = 0;
+									}
 								}
 
 								if (s_games[j].win) { // Si el jugador mata al rei contrario guardamos las variables de que jugador ha ganado y en que partida para enviar el mensaje al ganador
